@@ -1,6 +1,6 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import warnings
-from typing import Dict, Optional, Union
+from typing import Dict, Optional, Union, Tuple, List
 
 import mmcv
 import mmengine.fileio as fileio
@@ -11,12 +11,28 @@ from mmcv.transforms import LoadImageFromFile
 
 from mmseg.registry import TRANSFORMS
 from mmseg.utils import datafrombytes
+import cv2
 
 try:
     from osgeo import gdal
 except ImportError:
     gdal = None
 
+@TRANSFORMS.register_module()
+class LoadNRGB(BaseTransform):
+    def __init__(self,
+                 to_float32: bool = False):
+        self.to_float32 = to_float32
+    def transform(self, results: Dict)-> Dict | Tuple[List, List] | None :
+        filename = results['img_path']
+        img = cv2.imread(filename, cv2.IMREAD_UNCHANGED)
+        if self.to_float32:
+            img = img.astype(np.float32)
+        results['img'] = img        
+        results['img_shape'] = img.shape[:2]
+        results['ori_shape'] = img.shape[:2]
+
+        return results
 
 @TRANSFORMS.register_module()
 class LoadAnnotations(MMCV_LoadAnnotations):

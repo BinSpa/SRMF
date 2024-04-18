@@ -126,3 +126,28 @@ def stack_batch(inputs: List[torch.Tensor],
                     pad_shape=pad_img.shape[-2:]))
 
     return torch.stack(padded_inputs, dim=0), padded_samples
+
+
+def multicrop_stack_batch(inputs: List[torch.Tensor],
+                data_samples: Optional[SampleList] = None,
+                ) -> torch.Tensor:
+    assert isinstance(inputs, list), \
+        f'Expected input type to be list, but got {type(inputs)}'
+    assert len({tensor.ndim for tensor in inputs}) == 1, \
+        f'Expected the dimensions of all inputs must be the same, ' \
+        f'but got {[tensor.ndim for tensor in inputs]}'
+    assert inputs[0].ndim == 4, f'Expected tensor dimension to be 4, ' \
+        f'but got {inputs[0].ndim}'
+    assert len({tensor.shape[1] for tensor in inputs}) == 1, \
+        f'Expected the channels of all inputs must be the same, ' \
+        f'but got {[tensor.shape[1] for tensor in inputs]}'
+
+
+    trans_inputs = torch.stack(inputs, dim=0)
+    tensor_shape = trans_inputs.shape
+    levels = tensor_shape[1]
+    batch_size = tensor_shape[0]
+    ch, h, w = tensor_shape[2], tensor_shape[3], tensor_shape[4]
+    trans_inputs = trans_inputs.reshape(batch_size*levels, ch, h, w)
+    
+    return trans_inputs, data_samples    

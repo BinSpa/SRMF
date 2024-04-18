@@ -1,7 +1,9 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+import os
 import copy
 import inspect
 import warnings
+import jsonlines as jl
 from typing import Dict, List, Optional, Sequence, Tuple, Union
 
 import cv2
@@ -19,6 +21,14 @@ from scipy.ndimage import gaussian_filter
 from mmseg.datasets.dataset_wrappers import MultiImageMixDataset
 from mmseg.registry import TRANSFORMS
 
+import open_clip
+import torch
+from scipy.ndimage import label
+from collections import Counter
+from num2words import num2words
+
+from IPython import embed
+
 try:
     import albumentations
     from albumentations import Compose
@@ -27,6 +37,570 @@ except ImportError:
     albumentations = None
     Compose = None
     ALBU_INSTALLED = False
+
+@TRANSFORMS.register_module()
+class Get_Text(BaseTransform):
+    """
+    Add Keys:
+    - text_features
+    """      
+    def __init__(self, clip_text=None) -> None:
+        super().__init__()  
+        self.clip_text = clip_text
+    
+    def transform(self, results: Dict) -> Dict | Tuple[List, List] | None:
+        text_features = torch.load(self.clip_text, map_location='cpu')
+        results['text_features'] = text_features
+        return results
+        
+
+@TRANSFORMS.register_module()
+class Samhq_boxes(BaseTransform):
+    """Get instances boxes for every image, using sam-hq: https://github.com/SysCV/sam-hq
+    Required Keys:
+    - img
+    - gt_seg_map
+    - img_path
+
+    Add Keys:
+    - samhqbox
+    - samhqgt
+
+    Args:
+    - boxes_path
+    - record_path
+    - select_num: select boxes number for every image
+    - img_size: resized target
+    - scale_ratio: scale the boxes for more abundant features
+    - keep_gsd: whether resize boxes to img_size, or crop boxes to match img_size for keep the gsd
+    """
+    def __init__(self, 
+                 boxes_path: str = None,
+                 record_path: str = None,
+                 select_num: int = 4,
+                 img_size: tuple = (512,512),
+                 scale_ratio: float = 1.2,
+                 ifmc: bool = True,
+                 keep_gsd: bool = False) -> None:
+        super().__init__()
+        self.boxes_path = boxes_path
+        self.record_path = record_path
+        self.select_num = select_num
+        self.img_size = img_size
+        self.scale_ratio = scale_ratio
+        self.keep_gsd = keep_gsd
+        self.ifmc = ifmc
+    
+    def enlarge_box(self, x, y, w, h):
+        """
+        scale specified box
+        args:
+        - x,y,w,h
+        - scale
+
+        return:
+        - box
+        """
+        center_x = x + w/2
+        center_y = y + h/2
+
+        new_w = w * self.scale_ratio
+        new_h = h * self.scale_ratio
+
+        new_x = center_x - new_w / 2
+        new_y = center_y - new_h / 2
+
+        return int(max(new_x, 0)), int(max(new_y, 0)), int(new_w), int(new_h)
+
+    def crop_img(self, boxes, ori_img, ori_gt):
+        cropped_imgs = []
+        cropped_gts = []
+        ori_h, ori_w, _ = ori_img.shape
+        if self.ifmc == True:
+            select_boxes = boxes[:self.select_num]
+        elif self.ifmc == False:
+            select_boxes = self.exp_decay_sample_norm(boxes, k=self.select_num)
+        for box in select_boxes:
+            x,y,w,h = box["coordinates"]
+            x,y,w,h = self.enlarge_box(x,y,w,h)
+            cropped_img = ori_img[y:min(ori_h, y+h), x:min(ori_w, x+w), ...]
+            cropped_gt = ori_gt[y:min(ori_h, y+h), x:min(ori_w, x+w)]
+            if self.keep_gsd == False:
+                # resize cropped img to target size
+                resized_img = cv2.resize(cropped_img, (self.img_size[0], self.img_size[1]), interpolation=cv2.INTER_LINEAR)
+                resized_gt = cv2.resize(cropped_gt, (self.img_size[0], self.img_size[1]), interpolation=cv2.INTER_NEAREST)
+            else:
+                # crop img to target size
+                if y + self.img_size[0] > ori_h:
+                    start_y = ori_h - self.img_size[0]
+                    end_y = ori_h
+                else:
+                    start_y = y
+                    end_y = y + self.img_size[0]
+                if x + self.img_size[1] > ori_w:
+                    start_x = ori_w - self.img_size[1]
+                    end_x = ori_w
+                else:
+                    start_x = x
+                    end_x = x + self.img_size[1]
+                resized_img = ori_img[start_y:end_y, start_x:end_x, ...]
+                resized_gt = ori_gt[start_y:end_y, start_x:end_x]
+            cropped_imgs.append(resized_img)
+            cropped_gts.append(resized_gt)
+        
+        return np.stack(cropped_imgs, axis=0), np.stack(cropped_gts, axis=0)
+
+    def exp_decay_sample_norm(self, boxes, k=8, decay_rate=0.155):
+        weights = np.exp(-decay_rate * np.arange(len(boxes)))
+        normalized_weights = weights / np.sum(weights)
+        indices = random.choice(len(boxes), size=k, p=normalized_weights)
+        select_items = [boxes[indice] for indice in indices]
+        return select_items
+
+    def transform(self, results: Dict) -> Dict | Tuple[List, List] | None:
+        img_path = results["img_path"]
+        img_name = img_path.split('/')[-1]
+        record = dict()
+        img_info = dict()
+        with jl.open(self.record_path, 'r') as f:
+            for line in f:
+                record = line
+        index = record[img_name]
+        with jl.open(self.boxes_path, 'r') as f:
+            for i, line in enumerate(f):
+                if index == i:
+                    img_info = line
+                    break
+        boxes = img_info["boxes"]  
+        '''
+        index = self.record_path[img_name]
+        boxes = self.boxes_path[index]["boxes"]
+        '''      
+        ori_img = results["img"]
+        ori_gt = results["gt_seg_map"]
+        stacked_img, stacked_gt = self.crop_img(boxes, ori_img, ori_gt)
+        if self.ifmc == True:
+            results["samhqbox"] = stacked_img
+            results["samhqgt"] = stacked_gt
+        elif self.ifmc == False:
+            results["img"] = stacked_img
+            results["gt_seg_map"] = stacked_gt
+        
+        return results
+    
+    def __repr__(self):
+        return self.__class__.__name__ + f'(crop_size={self.crop_size})'
+
+
+@TRANSFORMS.register_module()
+class Select_PureBlocks(BaseTransform):
+    """Generate pure-blocks for one class in one image. It is used for contrastive learning. 
+    Required Keys:
+    - img
+    - gt_seg_map
+
+    Add Keys:
+    - pure-blocks
+
+    Args:
+    - block-size: the pure-class block size.
+    - ignore_index
+    """
+    def __init__(self,
+                 block_size: int = 16,
+                 num_preclass: int = 4,
+                 ignore_index: int = 255) -> None:
+        super().__init__()
+        self.block_size = block_size
+        self.num_preclass = num_preclass
+        self.ignore_index = ignore_index
+    
+    def find_blocks_for_each_class(self, class_num, img, label):
+        boxes_list = []
+        cls_indices = np.where(label==class_num)
+        # np.where返回的是满足条件的行索引和列索引，返回的是行列两个数组。
+        zipped_indices = list(zip(cls_indices[0], cls_indices[1]))
+        np.random.shuffle(zipped_indices)
+        for i, (row, col) in enumerate(zipped_indices):
+            if len(boxes_list) >= self.num_preclass or i > 1000:
+                # 如果已经找到了规定数量的box，结束
+                break
+            if row+self.block_size <= label.shape[0] and col + self.block_size <= label.shape[1]:
+                box = [row, col]
+                block = label[row:row+self.block_size, col:col+self.block_size]
+                if np.all(block == class_num):
+                    boxes_list.append(box)
+        
+        return boxes_list
+
+    def transform(self, results: Dict) -> Dict | Tuple[List, List] | None:
+        block_list = {}
+        image = results['img']
+        label = results['gt_seg_map']
+        unique_classes = np.unique(label)
+        for unique_class in unique_classes:
+            if unique_class == self.ignore_index:
+                continue
+            unique_class_boxes = self.find_blocks_for_each_class(unique_class, image, label)
+            # there should be at least two blocks for one class.
+            if len(unique_class_boxes) >= 2:
+                block_list[unique_class] = unique_class_boxes
+        results['pure_blocks'] = block_list
+        return results
+
+
+@TRANSFORMS.register_module()
+class Image_Level_Text(BaseTransform):
+    """Generate image-level texts for multi-level-cropped images, the captions for every image are Generated by well-designed modules.
+    The the captions are transformed into NxD vectors by using clip text-encoder.
+
+    Required Keys:
+    - img
+    - gt_seg_map
+
+    Add Keys:
+    - img_level_text
+
+    Args:
+
+    """
+    def __init__(self,
+                 level_list:list = [1,2,3,4],
+                 backbone_name: str = "ViT-B/32", 
+                 ckpt_path: str = None,
+                 class_names: list = None) -> None:
+        super().__init__()
+        self.level_list = level_list
+        self.backbone_name = backbone_name
+        self.ckpt_path = ckpt_path
+        self.class_names = class_names
+
+    def load_clip_model(self):
+        model, _, _ = open_clip.create_model_and_transforms(self.backbone_name, pretrained="openai")
+        if self.ckpt_path != None:
+            checkpoint = torch.load(self.ckpt_path, map_location="cpu")
+            msg = model.load_state_dict(checkpoint, strict=False)
+        return model
+    
+    def get_grid_position(self, x, y, width, height):
+        # Define the 2x2 grid dimensions
+        grid_width, grid_height = width / 2, height / 2
+        # Determine the grid position
+        col, row = int(x // grid_width), int(y // grid_height)
+        return row, col
+
+    def describe_objects(self, label_array, index_to_name):
+        height, width = label_array.shape
+
+        descriptions = []
+        for obj_index in np.unique(label_array):
+            if obj_index == 0 or obj_index == 255:
+                continue
+            object_name = index_to_name.get(obj_index, "unknown")
+
+            # Perform connected component analysis
+            binary_mask = (label_array == obj_index)
+            # num_features is the number of instances
+            labeled_array, num_features = label(binary_mask)
+
+            object_positions = []
+            for feature in range(1, num_features + 1):
+                feature_mask = (labeled_array == feature)
+                y, x = np.where(feature_mask)
+                # get the position of the object's center point
+                row, col = self.get_grid_position(x.mean(), y.mean(), width, height)
+                object_positions.append((row, col))
+            
+            # Count objects in each grid position
+            position_counts = Counter(object_positions)
+            most_common_position, count = position_counts.most_common(2)[0]
+            position_desc = ["top-left", "top-right",
+                         "bottom-left", "bottom-right"][most_common_position[0] * 2 + most_common_position[1]]
+            # 构建描述语句
+            verb = "located" if random.random() < 0.5 else "situated"
+            count_word = num2words(count)
+            if count == 1:
+                description = f"{count_word} {object_name} mostly {verb} in the {position_desc} region of the image"
+            else:
+                description = f"{count_word} {object_name}s mostly {verb} in the {position_desc} region of the image"
+            description = description + '.'
+            descriptions.append(description)
+
+        return ''.join(descriptions)
+    
+    def get_gen_text_feature(self, batch_crop_label, model):
+        '''
+        input:
+            - batch_crop_label:numpy [4, h, w]
+            - clip_model
+        return:
+            - generate text feature for every images, numpy:[4, dim]
+        '''
+        index2name = {}
+        for index, classname in enumerate(self.class_names):
+            index2name[index] = classname
+        batch_text = []
+        for _, one_crop in enumerate(batch_crop_label):
+            text = self.describe_objects(one_crop, index2name)
+            batch_text.append(text)
+        # batch_text:[4, (text)]
+        tokenizer = open_clip.tokenize
+        text_tensor = tokenizer(batch_text)
+        # move to gpu
+        # text_tensor = text_tensor.cuda()
+        # model = model.cuda()
+        with torch.no_grad():
+            text_feature = model.encode_text(text_tensor, normalize=True)
+        # text_feature = text_feature.to('cpu')
+        # text_tensor = text_tensor.to('cpu')
+        # model = model.to('cpu')
+        # torch.cuda.empty_cache()
+        return text_feature
+    
+    def transform(self, results: Dict) -> dict:
+        model = self.load_clip_model()
+        gt_labels = results['gt_seg_map']
+        text_feature = self.get_gen_text_feature(gt_labels, model=model)
+        # text_feature is a 4xdim feature
+        results['img_level_text'] = text_feature
+        return results
+    
+    def __repr__(self):
+        return self.__class__.__name__ + f'(clip_text_encoder={self.backbone_name})'
+
+
+
+@TRANSFORMS.register_module()
+class MultiLevelCrop(BaseTransform):
+    """Crop different level size images, and resize them to fixed size. We first need to get a fixed-size randomly clipped coordinates.
+    Then, according to the level list, larger sizes of cuts should include the original cut.
+
+    Required Keys:
+    - img
+    - gt_seg_map
+
+    Modified Keys:
+    - img
+    - gt_seg_map
+    - img_shape
+
+    Args:
+    crop_size (Union[int, Tuple[int, int]]):  Expected size after cropping
+        with the format of (h, w). If set to an integer, then cropping
+        width and height are equal to this integer.
+    cat_max_ratio (float): The maximum ratio that single category could
+        occupy.
+    ignore_index (int): The label index to be ignored. Default: 255
+    level_list (list): The multi crop levels, Default: [1, 2, 3, 4]
+    """
+    def __init__(self,
+                 crop_size: Union[int, Tuple[int, int]],
+                 cat_max_ratio: float = 1.,
+                 ignore_index: int = 255,
+                 level_list: list = [1,2,3,4],
+                 withlocal: bool = False):
+        super().__init__()
+        assert isinstance(crop_size, int) or (
+            isinstance(crop_size, tuple) and len(crop_size) == 2
+        ), 'The expected crop_size is an integer, or a tuple containing two '
+        'intergers'
+
+        if isinstance(crop_size, int):
+            crop_size = (crop_size, crop_size)
+        assert crop_size[0] > 0 and crop_size[1] > 0
+        self.crop_size = crop_size
+        self.cat_max_ratio = cat_max_ratio
+        self.ignore_index = ignore_index
+        self.level_list = level_list
+        self.withlocal = withlocal
+
+    @cache_randomness
+    def crop_bbox(self, results: dict) -> tuple:
+        """get a crop bounding box.
+
+        Args:
+            results (dict): Result dict from loading pipeline.
+
+        Returns:
+            tuple: Coordinates of the cropped image.
+        """
+
+        def generate_crop_bbox(img: np.ndarray) -> tuple:
+            """Randomly get a crop bounding box.
+
+            Args:
+                img (np.ndarray): Original input image.
+
+            Returns:
+                tuple: Coordinates of the cropped image.
+            """
+
+            margin_h = max(img.shape[0] - self.crop_size[0], 0)
+            margin_w = max(img.shape[1] - self.crop_size[1], 0)
+            offset_h = np.random.randint(0, margin_h + 1)
+            offset_w = np.random.randint(0, margin_w + 1)
+            crop_y1, crop_y2 = offset_h, offset_h + self.crop_size[0]
+            crop_x1, crop_x2 = offset_w, offset_w + self.crop_size[1]
+
+            return crop_y1, crop_y2, crop_x1, crop_x2
+
+        img = results['img']
+        crop_bbox = generate_crop_bbox(img)
+        if self.cat_max_ratio < 1.:
+            # Repeat 10 times
+            for _ in range(10):
+                seg_temp = self.crop(results['gt_seg_map'], crop_bbox)
+                labels, cnt = np.unique(seg_temp, return_counts=True)
+                cnt = cnt[labels != self.ignore_index]
+                if len(cnt) > 1 and np.max(cnt) / np.sum(cnt) < self.cat_max_ratio:
+                    break
+                crop_bbox = generate_crop_bbox(img)
+
+        return crop_bbox
+    
+    def Contained(self, coordinate1:tuple, coordinate2:tuple, size1:int, size2:int) -> bool:
+        """
+        Determine if the area defined by coordinate1 and size1 is completely contained
+        within the area defined by coordinate2 and size2.
+
+        Parameters:
+        - coordinate1: A tuple (top, left) representing the top-left corner of the first area.
+        - coordinate2: A tuple (top, left) representing the top-left corner of the second area.
+        - size1: A int (size1, size1) representing the size of the first area.
+        - size2: A int (size2, size2) representing the size of the second area.
+
+        Returns:
+        - True if the first area is completely contained within the second area, otherwise False.
+        """
+    
+        top1, left1 = coordinate1
+        top2, left2 = coordinate2
+        height1, width1 = size1, size1
+        height2, width2 = size2, size2
+
+        # Check if the top-left corner of area1 is within area2
+        if left1 >= left2 and top1 >= top2:
+            # Check if the bottom-right corner of area1 is within area2
+            if (left1 + width1) <= (left2 + width2) and (top1 + height1) <= (top2 + height2):
+                return True
+
+        return False
+
+    def gen_one_level_pool(self, image:np.ndarray, coordinate:tuple, crop_size:int, multi:int) -> list:
+        """
+        get one level crop coordinates pool for the original coordinate.
+        
+        Args:
+        - image: original image.
+        - coordinate: original crop coordinate.
+        - crop_size: original crop size.
+        - multi: scale ratio for original crop size.
+        
+        Return:
+        - pool: After the image has been slice according to the crop_size*multi, 
+        the coordinates of all the blocks that contain the original slicing.
+        """
+        pool = []
+        h,w = image.shape[0], image.shape[1]
+        multi_crop_size = multi*crop_size
+        stride = multi_crop_size-crop_size
+        n_crop_h, n_crop_w = (h-multi_crop_size) // stride+1, (w-multi_crop_size) // stride+1
+        for i in range(n_crop_h + 1):
+            for j in range(n_crop_w + 1):
+                start_i = i*stride
+                start_j = j*stride
+                end_i = min(start_i + multi_crop_size, h)
+                end_j = min(start_j + multi_crop_size, w)
+                start_i = max(end_i - multi_crop_size, 0)
+                start_j = max(end_j - multi_crop_size, 0)
+                if self.Contained((coordinate[0], coordinate[2]), (start_i, start_j), crop_size, multi_crop_size):
+                    # y1,y2,x1,x2
+                    pool.append((start_i, start_i+multi_crop_size, start_j, start_j+multi_crop_size))
+        return pool
+
+    def gen_multi_level_coord(self, image:np.ndarray, coordinate:tuple, levels:list) -> dict:
+        """
+        get one random coordinate for every level.
+
+        Args:
+        - image: original image.
+        - coordinate: original crop coordinate.
+        - levels: multi level crop levels.
+
+        Return:
+        - A dict that contains the coordinate for every key.
+        """
+        coordinate_list = []
+        for level in levels:
+            if level == 1:
+                coordinate_list.append(coordinate)
+            else:
+                pool = self.gen_one_level_pool(image, coordinate, self.crop_size[0], level)
+                if len(pool) == 0:
+                    coordinate_list.append(coordinate)
+                else:
+                    choice = np.random.randint(0, len(pool))
+                    coordinate_list.append(pool[choice])
+        return coordinate_list
+
+    def crop(self, img: np.ndarray, crop_bbox: tuple) -> np.ndarray:
+        """Crop from ``img``
+
+        Args:
+            img (np.ndarray): Original input image.
+            crop_bbox (tuple): Coordinates of the cropped image.
+
+        Returns:
+            np.ndarray: The cropped image.
+        """
+
+        crop_y1, crop_y2, crop_x1, crop_x2 = crop_bbox
+        img = img[crop_y1:crop_y2, crop_x1:crop_x2, ...]
+        return img
+    
+    def transform(self, results: dict) -> dict:
+        multi_level_crop_image = []
+        multi_level_crop_label = []
+        image = results['img']
+        label = results['gt_seg_map']
+        crop_bbox = self.crop_bbox(results)
+        coordinate_list = self.gen_multi_level_coord(image, crop_bbox, self.level_list)
+        for coordinate in coordinate_list:
+            # crop the image
+            crop_img = self.crop(image, coordinate)
+            resized_image = cv2.resize(crop_img, self.crop_size, interpolation=cv2.INTER_LINEAR)
+            multi_level_crop_image.append(resized_image)
+            # crop the label
+            crop_label = self.crop(label, coordinate)
+            resized_label = cv2.resize(crop_label, self.crop_size, interpolation=cv2.INTER_NEAREST)
+            multi_level_crop_label.append(resized_label)
+        
+        # (4,512,512,3)
+        stacked_images = np.stack(multi_level_crop_image, axis=0)
+        # (4,512,512)
+        stacked_labels = np.stack(multi_level_crop_label, axis=0)
+        # assert stacked_images.shape == (len(self.level_list), self.crop_size, self.crop_size, image.shape[-1]), f"expect the shape {(len(self.level_list), self.crop_size[0], self.crop_size[1], image.shape[-1])}, but got {stacked_images.shape}"
+        # assert stacked_labels.shape == (len(self.level_list), self.crop_size, self.crop_size), f"expect the shape {(len(self.level_list), self.crop_size[0], self.crop_size[1])}, but got {stacked_labels.shape}"
+        results['img'] = stacked_images
+        if self.withlocal:
+            results['gt_seg_map'] = multi_level_crop_label[0]
+            results['mc_seg_map'] = stacked_labels
+        else:
+            results['gt_seg_map'] = stacked_labels
+        if 'samhqbox' in results:
+            results['img'] = np.concatenate((results['img'],results['samhqbox']), axis=0)
+            results['gt_seg_map'] = np.concatenate((results['gt_seg_map'], results['samhqgt']), axis=0)
+            # assert False, "img shape:{}; gt_seg_map shape:{}".format(results['img'].shape, results['gt_seg_map'].shape)
+            assert results['img'].shape[0] == results['gt_seg_map'].shape[0], "expect same dim 0 for img and gt_seg_map, but got img:{}, gt:{}".format(results['img'].shape[0], results['gt_seg_map'].shape[0])
+            # embed()
+
+        results['img_shape'] = (self.crop_size, self.crop_size)
+
+        return results
+    
+    def __repr__(self):
+        return self.__class__.__name__ + f'(crop_size={self.crop_size})'
+
 
 
 @TRANSFORMS.register_module()
@@ -2512,3 +3086,53 @@ class RandomDepthMix(BaseTransform):
 
         results['img'] = img
         return results
+    
+@TRANSFORMS.register_module()
+class ColorJittering(BaseTransform):
+    """ColorJittering data argument.
+    adjust brightness and contrast.
+    Required Keys:
+    - img
+    
+    Add Keys:
+    - None
+
+    Args:
+    - brightness factor
+    - contrast factor
+    """
+    def __init__(self, 
+                 probility=0.5,
+                 bright_factor=0.2, 
+                 contrast_factor=0.2) -> None:
+        super().__init__()
+        self.bright_factor = bright_factor
+        self.contrast_factor = contrast_factor
+        self.probility = probility
+
+    def adjust_brightness(self, img):
+        img = img.astype(float)
+        img = img * self.bright_factor
+        img = np.clip(img, 0, 255)
+        return img.astype(np.uint8)
+    
+    def adjust_contrast(self, img):
+        img = img.astype(float)
+        mean = np.mean(img, axis=(0,1), keepdims=True)
+        img = (img - mean) * self.contrast_factor + mean
+        img = np.clip(img, 0, 255)
+        return img.astype(np.uint8)
+    
+    def transform(self, results: Dict) -> Dict | Tuple[List, List] | None:
+        random_num = random.random()
+        if random_num <= self.probility:
+            self.bright_factor = 1 + np.random.uniform(-self.bright_factor, self.bright_factor)
+            self.contrast_factor = 1 + np.random.uniform(-self.contrast_factor, self.contrast_factor)
+            img = results['img']
+            img = self.adjust_brightness(img)
+            img = self.adjust_contrast(img)
+
+            results['img'] = img
+
+        return results
+

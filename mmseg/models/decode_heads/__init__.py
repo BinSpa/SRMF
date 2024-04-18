@@ -35,6 +35,12 @@ from .setr_up_head import SETRUPHead
 from .stdc_head import STDCHead
 from .uper_head import UPerHead
 from .vpd_depth_head import VPDDepthHead
+from .multicrop_segformer_head import MultiCrop_SegformerHead
+from .image_projection import ImageProject_Head
+from .unidecoder_head import UniDecodeHead
+from .mcfusion_segformer_head import MCFusionSegformerHead
+from .pureblock_head import PureBlockHead
+from .mctext_segformer_head import MCText_SegformerHead
 
 __all__ = [
     'FCNHead', 'PSPHead', 'ASPPHead', 'PSAHead', 'NLHead', 'GCHead', 'CCHead',
@@ -44,5 +50,7 @@ __all__ = [
     'SETRMLAHead', 'DPTHead', 'SETRMLAHead', 'SegmenterMaskTransformerHead',
     'SegformerHead', 'ISAHead', 'STDCHead', 'IterativeDecodeHead',
     'KernelUpdateHead', 'KernelUpdator', 'MaskFormerHead', 'Mask2FormerHead',
-    'LightHamHead', 'PIDHead', 'DDRHead', 'VPDDepthHead', 'SideAdapterCLIPHead'
+    'LightHamHead', 'PIDHead', 'DDRHead', 'VPDDepthHead', 'SideAdapterCLIPHead',
+    'MultiCrop_SegformerHead', 'ImageProject_Head', 'UniDecodeHead', 'MCFusionSegformerHead',
+    'PureBlockHead', 'MCText_SegformerHead'
 ]

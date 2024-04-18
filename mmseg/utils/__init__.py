@@ -13,7 +13,7 @@ from .class_names import (ade_classes, ade_palette, bdd100k_classes,
 from .collect_env import collect_env
 from .get_templates import get_predefined_templates
 from .io import datafrombytes
-from .misc import add_prefix, stack_batch
+from .misc import add_prefix, stack_batch, multicrop_stack_batch
 from .set_env import register_all_modules
 from .tokenizer import tokenize
 from .typing_utils import (ConfigType, ForwardResults, MultiConfig,
@@ -22,11 +22,13 @@ from .typing_utils import (ConfigType, ForwardResults, MultiConfig,
 
 # isort: off
 from .mask_classification import MatchMasks, seg_data_to_instance_data
+from .multi_crop import multi_level_crop
 
 __all__ = [
     'collect_env',
     'register_all_modules',
     'stack_batch',
+    'multicrop_stack_batch',
     'add_prefix',
     'ConfigType',
     'OptConfigType',
@@ -67,4 +69,5 @@ __all__ = [
     'MatchMasks',
     'bdd100k_classes',
     'bdd100k_palette',
+    'multi_level_crop'
 ]

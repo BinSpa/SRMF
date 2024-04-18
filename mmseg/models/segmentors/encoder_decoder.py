@@ -261,6 +261,7 @@ class EncoderDecoder(BaseSegmentor):
 
         h_stride, w_stride = self.test_cfg.stride
         h_crop, w_crop = self.test_cfg.crop_size
+        # assert len(inputs.shape) == 4, "get the shape of inputs:{}".format(inputs.shape)
         batch_size, _, h_img, w_img = inputs.size()
         out_channels = self.out_channels
         h_grids = max(h_img - h_crop + h_stride - 1, 0) // h_stride + 1
