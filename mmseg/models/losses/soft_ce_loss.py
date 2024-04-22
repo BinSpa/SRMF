@@ -222,7 +222,7 @@ class SoftCrossEntropyLoss(nn.Module):
             Options are "none", "mean" and "sum".
         class_weight (list[float] | str, optional): Weight of each class. If in
             str format, read them from a file. Defaults to None.
-        soft_weight (float, optional): Weight of the loss. Defaults to 1.0.
+        loss_weight (float, optional): Weight of the loss. Defaults to 1.0.
         loss_name (str, optional): Name of the loss item. If you want this loss
             item to be included into the backward graph, `loss_` must be the
             prefix of the name. Defaults to 'loss_ce'.
@@ -236,7 +236,7 @@ class SoftCrossEntropyLoss(nn.Module):
                  use_mask=False,
                  reduction='mean',
                  class_weight=None,
-                 soft_weight=1.0,
+                 loss_weight=1.0,
                  loss_name='soft_loss_ce',
                  avg_non_ignore=False,
                  dataset='gid',
@@ -246,7 +246,7 @@ class SoftCrossEntropyLoss(nn.Module):
         self.use_sigmoid = use_sigmoid
         self.use_mask = use_mask
         self.reduction = reduction
-        self.soft_weight = soft_weight
+        self.loss_weight = loss_weight
         self.class_weight = get_class_weight(class_weight)
         self.avg_non_ignore = avg_non_ignore
         if not self.avg_non_ignore and self.reduction == 'mean':
@@ -322,7 +322,7 @@ class SoftCrossEntropyLoss(nn.Module):
             class_weight = None
         # Note: for BCE loss, label < 0 is invalid.
         # Caculate hard label loss
-        loss_cls = (1 - self.soft_weight) * self.cls_criterion(
+        loss_cls = (1 - self.loss_weight) * self.cls_criterion(
             cls_score,
             label,
             weight,
@@ -335,7 +335,7 @@ class SoftCrossEntropyLoss(nn.Module):
         # Caculate soft label loss
         soft_label = self.get_soft_label(label, self.dataset)
         loss_soft = -torch.mean((torch.sum(soft_label * torch.log_softmax(cls_score, dim=1), dim=1)))
-        loss_soft = self.soft_weight * loss_soft
+        loss_soft = self.loss_weight * loss_soft
         
         return loss_cls + loss_soft
 
