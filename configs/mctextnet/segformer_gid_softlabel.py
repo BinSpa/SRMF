@@ -8,6 +8,7 @@ record_path = '/data1/gyl/RS_DATASET/boxes_jsonl/gid_record.jsonl'
 boxes_path = '/data1/gyl/RS_DATASET/boxes_jsonl/gid_boxes.jsonl'
 
 crop_size = (512, 512)
+loss_decode = dict(type='SoftCrossEntropyLoss', soft_weight=0.5, dataset='gid')
 
 clip_text = "/data1/gyl/RS_Code/mmseg_exp/Code/clip_vith14_txtfeat.pt"
 data_preprocessor = dict(
@@ -31,7 +32,7 @@ model = dict(
         num_heads=[1, 2, 5, 8],
         num_layers=[3, 6, 40, 3]),
     decode_head=dict(type='MCText_SegformerHead', in_channels=[64, 128, 320, 512], num_classes=6, text_nums=54,
-                     loss_decode=dict(type='SoftCrossEntropyLoss', soft_weight=0.5, dataset='gid')),
+                     loss_decode=loss_decode),
     test_cfg = dict(mode='slide',crop_size=(512, 512),  stride=(341, 341)))
 
 optim_wrapper = dict(
