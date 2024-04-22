@@ -1,7 +1,12 @@
 _base_ = [
-    '../_base_/models/segformer_mit-b0.py', '../_base_/datasets/urur_512x512.py',
+    '../_base_/models/segformer_mit-b0.py', '../_base_/datasets/gid_512x512.py',
     '../_base_/default_runtime.py', '../_base_/schedules/schedule_160k.py'
 ]
+
+
+record_path = '/data1/gyl/RS_DATASET/boxes_jsonl/gid_record.jsonl'
+boxes_path = '/data1/gyl/RS_DATASET/boxes_jsonl/gid_boxes.jsonl'
+
 crop_size = (512, 512)
 
 clip_text = "/data1/gyl/RS_Code/mmseg_exp/Code/clip_vith14_txtfeat.pt"
@@ -15,6 +20,7 @@ data_preprocessor = dict(
     clip_text=clip_text,
     size=crop_size)
 checkpoint = 'https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b5_20220624-658746d9.pth'  # noqa
+norm_cfg = dict(type='SyncBN', requires_grad=True)
 model = dict(
     type='TextEncoderDecoder',
     data_preprocessor=data_preprocessor,
@@ -24,14 +30,15 @@ model = dict(
         embed_dims=64,
         num_heads=[1, 2, 5, 8],
         num_layers=[3, 6, 40, 3]),
-    decode_head=dict(type='MCText_SegformerHead', in_channels=[64, 128, 320, 512], num_classes=8, text_nums=54),
+    decode_head=dict(type='MCText_SegformerHead', in_channels=[64, 128, 320, 512], num_classes=6, text_nums=54,
+                     loss_decode=dict(type='SoftCrossEntropyLoss', soft_weight=0.5, dataset='gid')),
     test_cfg = dict(mode='slide',crop_size=(512, 512),  stride=(341, 341)))
 
 optim_wrapper = dict(
     _delete_=True,
     type='OptimWrapper',
     optimizer=dict(
-        type='AdamW', lr=0.00006, betas=(0.9, 0.999), weight_decay=0.01),
+        type='AdamW', lr=0.00006, betas=(0.9, 0.999), weight_decay=0.005),
     paramwise_cfg=dict(
         custom_keys={
             'pos_block': dict(decay_mult=0.),
@@ -52,9 +59,6 @@ param_scheduler = [
     )
 ]
 
-record_path = '/data1/gyl/RS_DATASET/boxes_jsonl/urur_record.jsonl'
-boxes_path = '/data1/gyl/RS_DATASET/boxes_jsonl/urur_boxes.jsonl'
-
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations'),
@@ -62,15 +66,14 @@ train_pipeline = [
     dict(type='Samhq_boxes', boxes_path=boxes_path, record_path=record_path, select_num=4, keep_gsd=True, ifmc=True),
     # dict(type='RandomCrop', crop_size=crop_size, cat_max_ratio=0.75),
     dict(type='RandomFlip', prob=0.8, direction=['horizontal', 'vertical']),
-    dict(type='MultiLevelCrop', crop_size=crop_size, cat_max_ratio=0.75, level_list=[1,2,3,4]),
+    dict(type='MultiLevelCrop', crop_size=crop_size, cat_max_ratio=0.75, level_list=[1,2,3,4], withlocal=False),
     dict(type='PackSegMultiInputs')
 ]
 
 test_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations'),
-    # dict(type='Resize', scale=(1024, 1024)),
-    # dict(type='RandomCrop', crop_size=crop_size, cat_max_ratio=0.75),
+    # dict(type='MultiLevelCrop', crop_size=crop_size, cat_max_ratio=0.75, level_list=[1,2,3,4], withlocal=True),
     dict(type='PackSegInputs')
 ]
 
@@ -84,11 +87,8 @@ train_cfg = dict(
 default_hooks = dict(
     checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=8000),
     logger=dict(type='LoggerHook', interval=1000, log_metric_by_epoch=False),
-    visualization=dict(type='SegVisualizationHook', interval=1)
 )
-
+# test visualizer
 vis_backends = [dict(type='LocalVisBackend')]
 visualizer = dict(
     type='SegLocalVisualizer', vis_backends=vis_backends, name='visualizer', alpha=1.0)
-
-
