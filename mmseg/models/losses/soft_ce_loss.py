@@ -296,6 +296,7 @@ class SoftCrossEntropyLoss(nn.Module):
         else:
             raise NotImplementedError
         b, h, w = label.shape
+        label[label == 255] = 0
         hard_labels_flat = label.view(-1).long()
         soft_labels_flat = F.embedding(hard_labels_flat, cor_matrix)
         soft_label = soft_labels_flat.view(b, h, w, class_num)
