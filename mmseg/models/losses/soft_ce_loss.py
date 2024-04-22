@@ -280,7 +280,7 @@ class SoftCrossEntropyLoss(nn.Module):
             [0.05734087, 0.06374903, 0.0637931, 0.68114282, 0.06806151, 0.06591267],
             [0.05792765, 0.06457202, 0.06758096, 0.06760595, 0.67658365, 0.06572976],
             [0.05823144, 0.0657711, 0.063348, 0.06586576, 0.06612559, 0.6806581]]
-            cor_matrix = torch.from_numpy(np.array(cor_matrix))
+            cor_matrix = torch.from_numpy(np.array(cor_matrix)).to(label.device)
         elif dataset == 'urur':
             class_num = 8
             cor_matrix = [
@@ -292,10 +292,11 @@ class SoftCrossEntropyLoss(nn.Module):
             [0.05019197, 0.05405223, 0.05244505, 0.04847511, 0.05321681, 0.63215379, 0.05408182, 0.05538322],
             [0.05126494, 0.0591253,  0.05694704, 0.05137928, 0.05921039, 0.05234748, 0.6118814,  0.05784415],
             [0.05100948, 0.0592503,  0.05626316, 0.05158429, 0.05829094, 0.05362709, 0.05786567, 0.61210906]]
-            cor_matrix = torch.from_numpy(np.array(cor_matrix))
+            cor_matrix = torch.from_numpy(np.array(cor_matrix)).to(label.device)
         else:
             raise NotImplementedError
         b, h, w = label.shape
+        label = torch.where(label == 255, torch.tensor(0, device=label.device), label)
         hard_labels_flat = label.view(-1).long()
         soft_labels_flat = F.embedding(hard_labels_flat, cor_matrix)
         soft_label = soft_labels_flat.view(b, h, w, class_num)
