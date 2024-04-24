@@ -452,6 +452,11 @@ class MultiLevelCrop(BaseTransform):
                 seg_temp = self.crop(results['gt_seg_map'], crop_bbox)
                 labels, cnt = np.unique(seg_temp, return_counts=True)
                 cnt = cnt[labels != self.ignore_index]
+                max_index = np.argmax(cnt)
+                # the main class should not be the background
+                if labels[max_index] == 0:
+                    crop_bbox = generate_crop_bbox(img)
+                    continue
                 if len(cnt) > 1 and np.max(cnt) / np.sum(cnt) < self.cat_max_ratio:
                     break
                 crop_bbox = generate_crop_bbox(img)
