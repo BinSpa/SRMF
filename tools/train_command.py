@@ -39,4 +39,4 @@ bash torchrun_train.sh ../configs/samhqnet/segformer_gid.py 1 --work-dir /data9/
 bash torchrun_train.sh ../configs/samhqnet/segformer_urur.py 1 --work-dir /data9/gyl/RS_Code/mmseg_exp/samhq_urur
 # soft label
 bash torchrun_train.sh ../configs/mctextnet/segformer_gid_softlabel.py 2 --work-dir ../../mmseg_exp/softlabel_gid
-bash torchrun_train.sh ../configs/mctextnet/segformer_urur_softlabel.py 2 --work-dir ../../mmseg_exp/softlabel_urur
+bash torchrun_train.sh ../configs/mctextnet/segformer_urur_softlabel.py 2 --work-dir n../../mmseg_exp/softlabel_urur
