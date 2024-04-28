@@ -425,7 +425,7 @@ class MultiLevelCrop(BaseTransform):
             tuple: Coordinates of the cropped image.
         """
 
-        def generate_crop_bbox(img: np.ndarray) -> tuple:
+        def generate_crop_bbox(img: np.ndarray, lbl: np.ndarray) -> tuple:
             """Randomly get a crop bounding box.
 
             Args:
@@ -439,6 +439,12 @@ class MultiLevelCrop(BaseTransform):
             margin_w = max(img.shape[1] - self.crop_size[1], 0)
             offset_h = np.random.randint(0, margin_h + 1)
             offset_w = np.random.randint(0, margin_w + 1)
+            while True:
+                # make sure the top left pixel is not background
+                if lbl[offset_h, offset_w] != 0:
+                    break
+                offset_h = np.random.randint(0, margin_h + 1)
+                offset_w = np.random.randint(0, margin_w + 1)
             crop_y1, crop_y2 = offset_h, offset_h + self.crop_size[0]
             crop_x1, crop_x2 = offset_w, offset_w + self.crop_size[1]
 
