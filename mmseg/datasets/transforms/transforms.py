@@ -441,7 +441,7 @@ class MultiLevelCrop(BaseTransform):
             offset_w = np.random.randint(0, margin_w + 1)
             while True:
                 # make sure the top left pixel is not background
-                if lbl[offset_h, offset_w] != 0:
+                if lbl[offset_h, offset_w] != 0 and lbl[offset_h, offset_w] != self.ignore_index:
                     break
                 offset_h = np.random.randint(0, margin_h + 1)
                 offset_w = np.random.randint(0, margin_w + 1)
@@ -451,21 +451,28 @@ class MultiLevelCrop(BaseTransform):
             return crop_y1, crop_y2, crop_x1, crop_x2
 
         img = results['img']
-        crop_bbox = generate_crop_bbox(img)
+        lbl = results['gt_seg_map']
+        crop_bbox = generate_crop_bbox(img, lbl)
         if self.cat_max_ratio < 1.:
             # Repeat 10000 times
             for _ in range(10000):
                 seg_temp = self.crop(results['gt_seg_map'], crop_bbox)
                 labels, cnt = np.unique(seg_temp, return_counts=True)
                 cnt = cnt[labels != self.ignore_index]
+                if cnt.size == 0:
+                    continue
                 max_index = np.argmax(cnt)
                 # the main class should not be the background
                 if labels[max_index] == 0:
-                    crop_bbox = generate_crop_bbox(img)
-                    continue
+                    # if background is larger than 50%
+                    if np.max(cnt) / np.sum(cnt) > 0.5:
+                        crop_bbox = generate_crop_bbox(img, lbl)
+                        continue
+                    else:
+                        break
                 if len(cnt) > 1 and np.max(cnt) / np.sum(cnt) < self.cat_max_ratio:
                     break
-                crop_bbox = generate_crop_bbox(img)
+                crop_bbox = generate_crop_bbox(img, lbl)
 
         return crop_bbox
     
