@@ -349,6 +349,7 @@ class TextEncoderDecoder(BaseSegmentor):
         if self.test_cfg.mode == 'slide':
             seg_logit = self.slide_inference(inputs, batch_img_metas, data_samples)
             # save logits to visualize
+            '''
             b, c, h, w = seg_logit.shape
             save_dir = '/data1/gyl/RS_Code/visual/mctext/urur_logit'
             save_logit = seg_logit.cpu().detach().numpy()
@@ -357,6 +358,7 @@ class TextEncoderDecoder(BaseSegmentor):
                	img_name = img_path.split('/')[-1].split('.')[0]
                 save_name = os.path.join(save_dir, img_name) + '.npy'
                 np.save(save_name, save_logit[i])
+            '''
 	    # save end 
         else:
             seg_logit = self.whole_inference(inputs, batch_img_metas, data_samples)
