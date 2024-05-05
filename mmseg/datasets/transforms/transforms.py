@@ -458,11 +458,14 @@ class MultiLevelCrop(BaseTransform):
             for _ in range(10000):
                 seg_temp = self.crop(results['gt_seg_map'], crop_bbox)
                 labels, cnt = np.unique(seg_temp, return_counts=True)
-                cnt = cnt[labels != self.ignore_index]
+                # cnt = cnt[labels != self.ignore_index]
                 if cnt.size == 0:
                     continue
                 max_index = np.argmax(cnt)
-                # the main class should not be the background
+                # the main class should not be the background or ignore index
+                if labels[max_index] == self.ignore_index:
+                    crop_bbox = generate_crop_bbox(img, lbl)
+                    continue
                 if labels[max_index] == 0:
                     # if background is larger than 50%
                     if np.max(cnt) / np.sum(cnt) > 0.5:
