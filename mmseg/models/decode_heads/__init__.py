@@ -41,6 +41,7 @@ from .unidecoder_head import UniDecodeHead
 from .mcfusion_segformer_head import MCFusionSegformerHead
 from .pureblock_head import PureBlockHead
 from .mctext_segformer_head import MCText_SegformerHead
+from .segformer_proto_head import Proto_SegformerHead
 
 __all__ = [
     'FCNHead', 'PSPHead', 'ASPPHead', 'PSAHead', 'NLHead', 'GCHead', 'CCHead',
@@ -52,5 +53,5 @@ __all__ = [
     'KernelUpdateHead', 'KernelUpdator', 'MaskFormerHead', 'Mask2FormerHead',
     'LightHamHead', 'PIDHead', 'DDRHead', 'VPDDepthHead', 'SideAdapterCLIPHead',
     'MultiCrop_SegformerHead', 'ImageProject_Head', 'UniDecodeHead', 'MCFusionSegformerHead',
-    'PureBlockHead', 'MCText_SegformerHead'
+    'PureBlockHead', 'MCText_SegformerHead', 'Proto_SegformerHead'
 ]
