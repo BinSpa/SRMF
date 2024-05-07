@@ -98,12 +98,17 @@ class Proto_SegformerHead(BaseMultiCropDecodeHead):
             similarity_map_i = similarity_map[:, i, :, :]
             # find topk similarity
             topk_values, topk_indices = torch.topk(similarity_map_i.view(b, -1), k=self.k, dim=1, largest=True, sorted=False)
-            topk_feature_vectors = project_outs.view(b, d, h*w)[:, :, topk_indices]
+            # (b,k) -> (b,d,k)
+            topk_indices = topk_indices.unsqueeze(1).expand(-1, d, -1)
+            project_outs_flat = project_outs.view(b, d, h*w)
+            # (b, d, 10)
+            topk_feature_vectors = torch.gather(project_outs_flat, 2, topk_indices)
             # mean:(b,d)
             topk_feature_vectors = topk_feature_vectors.mean(dim=2)
             # calculate all batch means:(d,)
             mean_feature_vector = topk_feature_vectors.mean(dim=0)
             # momentum
+            assert self.prototypes[i].shape == mean_feature_vector.shape, "prototypes:{}, mean_feature_vector:{}".format(self.prototypes[i].shape, mean_feature_vector.shape)
             new_prototypes[i] = self.momentum * self.prototypes[i] + (1 - self.momentum) * mean_feature_vector
         self.prototypes.data.copy_(new_prototypes)
         # fusion feautres

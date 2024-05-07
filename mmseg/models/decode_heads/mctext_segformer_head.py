@@ -20,7 +20,7 @@ class MCText_SegformerHead(BaseTextDecodeHead):
         interpolate_mode: The interpolate mode of MLP head upsample operation.
             Default: 'bilinear'.
     """
-
+    
     def __init__(self, interpolate_mode='bilinear', **kwargs):
         super().__init__(input_transform='multiple_select', **kwargs)
 
