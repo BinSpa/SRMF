@@ -56,7 +56,7 @@ class Proto_SegformerHead(BaseMultiCropDecodeHead):
                     act_cfg=self.act_cfg))
 
         self.fusion_conv = ConvModule(
-            in_channels=self.channels * num_inputs,
+            in_channels=self.channels * num_inputs + 54,
             out_channels=self.channels,
             kernel_size=1,
             norm_cfg=self.norm_cfg)
@@ -66,7 +66,7 @@ class Proto_SegformerHead(BaseMultiCropDecodeHead):
                                        requires_grad=False)
         self.k = k
         self.momentum = momentum
-        self.img_project = ConvMLP(in_channels=self.channels * num_inputs, hidden_channels=1240, out_channels=1024)
+        self.img_project = ConvMLP(in_channels=self.channels * num_inputs, hidden_channels=1024, out_channels=1024)
 
     def forward(self, inputs):
         # Receive 4 stage backbone feature map: 1/4, 1/8, 1/16, 1/32
