@@ -9,6 +9,8 @@ from mmseg.models.decode_heads.decode_head import BaseMultiCropDecodeHead
 from mmseg.registry import MODELS
 from ..utils import resize
 
+from .replknet import RepLKNetStage
+
 
 class ConvMLP(nn.Module):
     def __init__(self, in_channels, hidden_channels, out_channels):
@@ -36,7 +38,10 @@ class Proto_SegformerHead(BaseMultiCropDecodeHead):
             Default: 'bilinear'.
     """
 
-    def __init__(self, k=10, momentum=0.999, text_path=None, interpolate_mode='bilinear', **kwargs):
+    def __init__(self, k=10, momentum=0.999, text_path=None, interpolate_mode='bilinear', 
+                 iflk=False, large_kernel_sizes=[31,29,27,13], layers=[2,2,2,2], drop_path_rate=0.3,
+                 small_kernel=5, dw_ratio=1, ffn_ratio=4, small_kernel_merged=False, norm_intermediate_features=False,
+                 **kwargs):
         super().__init__(input_transform='multiple_select', **kwargs)
 
         self.interpolate_mode = interpolate_mode
@@ -54,22 +59,57 @@ class Proto_SegformerHead(BaseMultiCropDecodeHead):
                     stride=1,
                     norm_cfg=self.norm_cfg,
                     act_cfg=self.act_cfg))
-
+        # convmodule for fusion all feature 
         self.fusion_conv = ConvModule(
-            in_channels=self.channels * num_inputs + 54,
+            in_channels=self.channels * num_inputs + 54 + 64,
             out_channels=self.channels,
             kernel_size=1,
             norm_cfg=self.norm_cfg)
-
+        # text feature for prototype
         text_feature = torch.load(text_path, map_location='cpu')
         self.prototypes = nn.Parameter(text_feature,
                                        requires_grad=False)
         self.k = k
         self.momentum = momentum
+        # MLP to align image feature to text feature
         self.img_project = ConvMLP(in_channels=self.channels * num_inputs, hidden_channels=1024, out_channels=1024)
+        # large kernel to extract feature
+        self.iflk = iflk
+        if self.iflk:
+            # conv module
+            self.lk_stages = nn.ModuleList()
+            dpr = [x.item() for x in torch.linspace(0, drop_path_rate, sum(layers))]
+            for stage_idx in range(num_inputs):
+                lk_layer = RepLKNetStage(channels=self.in_channels[stage_idx], num_blocks=layers[stage_idx],
+                        stage_lk_size=large_kernel_sizes[stage_idx],
+                        drop_path=dpr[sum(layers[:stage_idx]):sum(layers[:stage_idx + 1])],
+                        small_kernel=small_kernel, dw_ratio=dw_ratio, ffn_ratio=ffn_ratio,
+                        use_checkpoint=False, small_kernel_merged=small_kernel_merged,
+                        norm_intermediate_features=norm_intermediate_features)
+                self.lk_stages.append(lk_layer)
+            # fusion module
+            self.lk_convs = ConvModule(
+                    in_channels=1024,
+                    out_channels=64,
+                    kernel_size=1,
+                    stride=1,
+                    norm_cfg=self.norm_cfg,
+                    act_cfg=self.act_cfg)
+
 
     def forward(self, inputs):
         # Receive 4 stage backbone feature map: 1/4, 1/8, 1/16, 1/32
+        # large kernel handle
+        lk_outs = []
+        if self.iflk:
+            for idx, input in enumerate(inputs):
+                lk_outs.append(self.lk_stages[idx](input))
+            for idx, lk_out in enumerate(lk_outs):
+                lk_outs[idx] = resize(input=lk_out,
+                                      size=lk_outs[0].shape[2:],
+                                      mode=self.interpolate_mode,
+                                      align_corners=self.align_corners)
+            lk_features = self.lk_convs(torch.cat(lk_outs, dim=1))
         inputs = self._transform_inputs(inputs)
         outs = []
         for idx in range(len(inputs)):
@@ -89,6 +129,12 @@ class Proto_SegformerHead(BaseMultiCropDecodeHead):
         norm_protos = self.prototypes / self.prototypes.norm(dim=1, keepdim=True)
         # cosine similarity
         similarity_map = torch.einsum('nd,bdhw->bnhw', norm_protos, norm_outs)
+        # generate mask using entropy
+        entropy_imgtxt_feature = F.softmax(similarity_map, dim=1)
+        entropies = -(entropy_imgtxt_feature * entropy_imgtxt_feature.clamp(min=1e-12).log2()).sum(dim=1)
+        entropy_mask = (entropies > 5.75476).float()
+        # assert False, "lk_features:{}; entropy_mask:{}".format(lk_features.shape, entropy_mask.shape)
+        lk_features = lk_features * (entropy_mask.unsqueeze(1))
         # select pixels to update prototypes
         n, d = norm_protos.shape
         b, _, h, w  = norm_outs.shape
@@ -113,6 +159,7 @@ class Proto_SegformerHead(BaseMultiCropDecodeHead):
         self.prototypes.data.copy_(new_prototypes)
         # fusion feautres
         outs.append(similarity_map)
+        outs.append(lk_features)
         out = self.fusion_conv(torch.cat(outs, dim=1))
 
         out = self.cls_seg(out)
