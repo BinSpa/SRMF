@@ -654,7 +654,8 @@ class MultiLevelCrop(BaseTransform):
         pool = []
         h,w = image.shape[0], image.shape[1]
         multi_crop_size = multi*crop_size
-        stride = multi_crop_size-crop_size
+        # stride = multi_crop_size-crop_size
+        stride = crop_size
         n_crop_h, n_crop_w = (h-multi_crop_size) // stride+1, (w-multi_crop_size) // stride+1
         for i in range(n_crop_h + 1):
             for j in range(n_crop_w + 1):

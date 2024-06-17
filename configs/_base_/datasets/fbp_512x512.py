@@ -1,6 +1,6 @@
 # dataset settings
 dataset_type = 'FBPDataset'
-data_root = '/mnt/data/nas/gyl/RS_DATASET/FBP'
+data_root = '/data1/gyl/RS_DATASET/FBP'
 crop_size = (512, 512)
 train_pipeline = [
     dict(type='LoadImageFromFile'),

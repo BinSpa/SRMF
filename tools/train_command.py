@@ -1,7 +1,7 @@
 bash torchrun_train.sh /mnt/data/nas/gyl/RS_Code/mmsegmentation/configs/pvtv2/pvtv2-b5_blu-512x512.py 2 --work-dir /mnt/data/nas/gyl/RS_Code/mmsegmentation/experiments/pvtv2_blu
 bash torchrun_train.sh /data/RS_Code/mmsegmentation/configs/deeplabv3plus/deeplabv3plus_r101-80k_blu-512x512.py 2 --work-dir /data/RS_Code/mmsegmentation/experiments/deeplabv3p_blu
 bash torchrun_train.sh ../configs/segformer/segformer-b2_gid.py 1 --work-dir ../../mmseg_exp/segformerb2_gid
-bash torchrun_train.sh ../configs/segformer/segformer-b2_fbp.py 1 --work-dir ../../mmseg_exp/segformerb2_fbp
+bash torchrun_train.sh ../configs/segformer/segformer-b5_fbp.py 2 --work-dir ../../mmseg_exp/segformerb5_fbp
 # deeplabv3+ gid
 bash torchrun_train.sh /mnt/data/nas/gyl/RS_Code/mmsegmentation/configs/deeplabv3plus/deeplabv3plus_r101-d8_4xb4-160k_gid-512x512.py 1 --work-dir /mnt/data/nas/gyl/RS_Code/mmseg_exp/deeplab_gid
 bash torchrun_train.sh /mnt/data/nas/gyl/RS_Code/mmsegmentation/configs/segformer/segformer_mit-b5_8xb2-160k_gid-512x512.py 1 --work-dir /mnt/data/nas/gyl/RS_Code/mmseg_exp/segformer_gid
@@ -10,12 +10,7 @@ bash torchrun_train.sh /mnt/data/nas/gyl/RS_Code/mmsegmentation/configs/deeplabv
 # mc exp
 bash torchrun_train.sh ../configs/multicropnet/segformer_mit-b5_8xb2-160k_gid-512x512-ce.py 1 --work-dir /data9/gyl/RS_Code/mmseg_exp/mcgid_ce
 bash torchrun_train.sh ../configs/multicropnet/segformer_mit-b5_8xb2-160k_urur-512x512-ce.py 1 --work-dir /data9/gyl/RS_Code/mmseg_exp/mcurur_ce
-bash torchrun_train.sh ../configs/multicropnet/segformer_mit-b5_8xb2-160k_gid-512x512-ce-dice.py 1 --work-dir /data9/gyl/RS_Code/mmseg_exp/mcgid_ce_dice
-bash torchrun_train.sh ../configs/multicropnet/segformer_mit-b5_8xb2-160k_urur-512x512-ce-dice.py 1 --work-dir /data9/gyl/RS_Code/mmseg_exp/mcurur_ce_dice
-bash torchrun_train.sh ../configs/multicropnet/segformer_mit-b5_8xb2-160k_gid-512x512-focal.py 1 --work-dir /data9/gyl/RS_Code/mmseg_exp/mcgid_focal
-bash torchrun_train.sh ../configs/multicropnet/segformer_mit-b5_8xb2-160k_urur-512x512-focal.py 1 --work-dir /data9/gyl/RS_Code/mmseg_exp/mcurur_focal
-bash torchrun_train.sh ../configs/multicropnet/segformer_mit-b5_8xb2-160k_gid-512x512-focal-dice.py 1 --work-dir /data9/gyl/RS_Code/mmseg_exp/mcgid_focal_dice
-bash torchrun_train.sh ../configs/multicropnet/segformer_mit-b5_8xb2-160k_urur-512x512-focal-dice.py 1 --work-dir /data9/gyl/RS_Code/mmseg_exp/mcurur_focal_dice
+bash torchrun_train.sh ../configs/multicropnet/segformer-b5_fbp.py 2 --work-dir ../../mmseg_exp/segformerb5mc_fbp
 # mccolor
 bash torchrun_train.sh ../configs/multicropnet/segformer_mit-b5_8xb2-160k_gid-512x512-ce.py 1 --work-dir /data9/gyl/RS_Code/mmseg_exp/mcgid_color
 bash torchrun_train.sh ../configs/multicropnet/segformer_mit-b5_8xb2-160k_urur-512x512-ce.py 1 --work-dir /data9/gyl/RS_Code/mmseg_exp/mcurur_color
