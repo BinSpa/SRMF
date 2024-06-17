@@ -1,5 +1,5 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from .formatting import PackSegInputs, PackSegMultiInputs, PackPBSegInputs
+from .formatting import PackSegInputs, PackSegMultiInputs, PackSegShapeInputs
 from .loading import (LoadAnnotations, LoadBiomedicalAnnotation,
                       LoadBiomedicalData, LoadBiomedicalImageFromFile,
                       LoadDepthAnnotation, LoadImageFromNDArray,
@@ -14,13 +14,13 @@ from .transforms import (CLAHE, AdjustGamma, Albu, BioMedical3DPad,
                          RandomRotate, RandomRotFlip, Rerange, Resize,
                          ResizeShortestEdge, ResizeToMultiple, RGB2Gray,
                          SegRescale, MultiLevelCrop, Image_Level_Text, 
-                         Samhq_boxes, ColorJittering)
+                         Samhq_boxes, ColorJittering, Shape_Detect)
 
 # yapf: enable
 __all__ = [
     'LoadAnnotations', 'RandomCrop', 'BioMedical3DRandomCrop', 'SegRescale',
     'PhotoMetricDistortion', 'RandomRotate', 'AdjustGamma', 'CLAHE', 'Rerange',
-    'RGB2Gray', 'RandomCutOut', 'RandomMosaic', 'PackSegInputs', 'PackSegMultiInputs', 'PackPBSegInputs',
+    'RGB2Gray', 'RandomCutOut', 'RandomMosaic', 'PackSegInputs', 'PackSegMultiInputs', 'PackSegShapeInputs',
     'ResizeToMultiple', 'LoadImageFromNDArray', 'LoadBiomedicalImageFromFile',
     'LoadBiomedicalAnnotation', 'LoadBiomedicalData', 'GenerateEdge',
     'ResizeShortestEdge', 'BioMedicalGaussianNoise', 'BioMedicalGaussianBlur',
@@ -28,5 +28,5 @@ __all__ = [
     'RandomRotFlip', 'Albu', 'LoadSingleRSImageFromFile', 'ConcatCDInput',
     'LoadMultipleRSImageFromFile', 'LoadDepthAnnotation', 'RandomDepthMix',
     'RandomFlip', 'Resize', 'MultiLevelCrop', 'Image_Level_Text', 'Samhq_boxes', 
-    'ColorJittering',
+    'ColorJittering', 'Shape_Detect'
 ]

@@ -6,9 +6,10 @@ from .encoder_decoder import EncoderDecoder
 from .multimodal_encoder_decoder import MultimodalEncoderDecoder
 from .seg_tta import SegTTAModel
 from .mc_encoder_decoder import MCEncoderDecoder
-from .pb_encoder_decoder import PBEncoderDecoder
 from .text_encoder_decoder import TextEncoderDecoder
+from .shape_encoder_decoder import ShapeEncoderDecoder
 __all__ = [
     'BaseSegmentor', 'EncoderDecoder', 'CascadeEncoderDecoder', 'SegTTAModel',
-    'MultimodalEncoderDecoder', 'DepthEstimator', 'MCEncoderDecoder', 'PBEncoderDecoder', 'TextEncoderDecoder'
+    'MultimodalEncoderDecoder', 'DepthEstimator', 
+    'MCEncoderDecoder', 'TextEncoderDecoder', 'ShapeEncoderDecoder'
 ]

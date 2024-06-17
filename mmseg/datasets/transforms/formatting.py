@@ -202,38 +202,9 @@ class PackSegInputs(BaseTransform):
         repr_str = self.__class__.__name__
         repr_str += f'(meta_keys={self.meta_keys})'
         return repr_str
-    
+
 @TRANSFORMS.register_module()
-class PackPBSegInputs(BaseTransform):
-    """Pack the inputs data for the semantic segmentation.
-
-    The ``img_meta`` item is always populated.  The contents of the
-    ``img_meta`` dictionary depends on ``meta_keys``. By default this includes:
-
-        - ``img_path``: filename of the image
-
-        - ``ori_shape``: original shape of the image as a tuple (h, w, c)
-
-        - ``img_shape``: shape of the image input to the network as a tuple \
-            (h, w, c).  Note that images may be zero padded on the \
-            bottom/right if the batch tensor is larger than this shape.
-
-        - ``pad_shape``: shape of padded images
-
-        - ``scale_factor``: a float indicating the preprocessing scale
-
-        - ``flip``: a boolean indicating if image flip transform was used
-
-        - ``flip_direction``: the flipping direction
-
-    Args:
-        meta_keys (Sequence[str], optional): Meta keys to be packed from
-            ``SegDataSample`` and collected in ``data[img_metas]``.
-            Default: ``('img_path', 'ori_shape',
-            'img_shape', 'pad_shape', 'scale_factor', 'flip',
-            'flip_direction')``
-    """
-
+class PackSegShapeInputs(BaseTransform):
     def __init__(self,
                  meta_keys=('img_path', 'seg_map_path', 'ori_shape',
                             'img_shape', 'pad_shape', 'scale_factor', 'flip',
@@ -266,6 +237,7 @@ class PackPBSegInputs(BaseTransform):
             packed_results['inputs'] = img
 
         data_sample = SegDataSample()
+        # assert False, "results:{}".format(results.keys())
         if 'gt_seg_map' in results:
             if len(results['gt_seg_map'].shape) == 2:
                 data = to_tensor(results['gt_seg_map'][None,
@@ -290,9 +262,18 @@ class PackPBSegInputs(BaseTransform):
                 data=to_tensor(results['gt_depth_map'][None, ...]))
             data_sample.set_data(dict(gt_depth_map=PixelData(**gt_depth_data)))
 
-        if 'pure_blocks' in results:
-            data_sample.set_data(dict(pure_blocks=results['pure_blocks']))
+        if 'shape_map' in results:
+            # (1,3,h,w)
+            shape_map_data = dict(
+                shape_map_data=to_tensor(results['shape_map'].astype(np.float32)))
+            data_sample.set_data(shape_map_data)
 
+        if 'shape_index' in results:
+            # (1,h,w)
+            shape_index_data = dict(
+                shape_index_data=to_tensor(results['shape_index'].astype(np.int64)))
+            data_sample.set_data(shape_index_data)
+            
         img_meta = {}
         for key in self.meta_keys:
             if key in results:

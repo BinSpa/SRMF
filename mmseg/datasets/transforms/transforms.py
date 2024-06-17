@@ -39,20 +39,207 @@ except ImportError:
     ALBU_INSTALLED = False
 
 @TRANSFORMS.register_module()
-class Get_Text(BaseTransform):
+class Shape_Detect(BaseTransform):
     """
+    Required Keys:
+    - img
+    - gt_seg_map
+
     Add Keys:
-    - text_features
-    """      
-    def __init__(self, clip_text=None) -> None:
-        super().__init__()  
-        self.clip_text = clip_text
+    - shape_image
     
-    def transform(self, results: Dict) -> Dict | Tuple[List, List] | None:
-        text_features = torch.load(self.clip_text, map_location='cpu')
-        results['text_features'] = text_features
-        return results
+
+    """
+    def __init__(self, multi_size=5, cat_max_ratio=0.8, ignore_index=255):
+        self.multi_size = multi_size
+        self.cat_max_ratio = cat_max_ratio
+        self.ignore_index = ignore_index
+    
+    def ori_crop(self, results, size=(512, 512)):
+        def generate_crop_boxes(img, size=(512, 512)):
+            '''
+            random crop ;
+            return offset_h, offset_w ;
+            '''
+            margin_h = max(img.shape[0] - size[0], 0)
+            margin_w = max(img.shape[1] - size[1], 0)
+            offset_h = np.random.randint(0, margin_h+1)
+            offset_w = np.random.randint(0, margin_w+1)
+            return offset_h, offset_w
+
+        img = results['img']
+        lbl = results['gt_seg_map']
+        # generate crop boxes
+        offset_h, offset_w = generate_crop_boxes(img, size)
+        for _ in range(10000):
+            crop_img = img[offset_h:offset_h+size[0], offset_w:offset_w+size[1], ...]
+            crop_lbl = lbl[offset_h:offset_h+size[0], offset_w:offset_w+size[1], ...]
+            # check cat max ratio
+            labels, cnt = np.unique(crop_lbl, return_counts=True)
+            if cnt.size == 0:
+                continue
+            max_index = np.argmax(cnt)
+            if labels[max_index] == self.ignore_index:
+                offset_h, offset_w = generate_crop_boxes(img, size)
+                continue
+            if labels[max_index] == 0:
+                # if background is larger than 50%
+                if np.max(cnt) / np.sum(cnt) > 0.5:
+                    offset_h, offset_w = generate_crop_boxes(img, size)
+                    continue
+                else:
+                    break
+            if len(cnt) > 1 and np.max(cnt) / np.sum(cnt) < self.cat_max_ratio:
+                break
+            offset_h, offset_w = generate_crop_boxes(img, size)
         
+        return offset_h, offset_w
+    
+    def generate_multi_crop(self, img_shape, y, x, h, w, ratio=5):
+        '''
+        input : x,y,h,w
+        return : x,y,h,w,offset_y,offset_x
+        '''
+        # mode='keep_ratio', we always keep the shape of the image.
+        mh, mw = h*ratio, w*ratio
+        centery, centerx = y + h/2, x + w/2 
+        my, mx = centery - mh // 2, centerx - mw // 2
+        ry, rx = my + mh, mx + mw
+        if my < 0 :
+            my = 0
+            ry = my + mh
+        if mx < 0:
+            mx = 0
+            rx = mx + mw
+        if ry > img_shape[0]:
+            ry = img_shape[0]
+            my = ry - mh
+        if rx > img_shape[1]:
+            rx = img_shape[1]
+            mx = rx - mw
+        offset_y = y - my
+        offset_x = x - mx
+        return int(my), int(mx), int(ry), int(rx), int(offset_y), int(offset_x) 
+
+    def slic_superpixels(self, image, num_segments=25, compactness=10, step=20):
+        # 载入图像
+        # image = cv2.imread(image_path)
+        # image = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
+
+        # 创建SLIC对象
+        slic = cv2.ximgproc.createSuperpixelSLIC(image, algorithm=cv2.ximgproc.SLIC, region_size=int(np.sqrt(image.size / num_segments)), ruler=compactness)
+
+        # 执行SLIC算法
+        slic.iterate(step)  # 你可以调整迭代次数
+        # 强制连通性
+        slic.enforceLabelConnectivity(min_element_size=25)
+        # 获取最终的超像素数量
+        number_sp = slic.getNumberOfSuperpixels()
+        # 获取超像素标签
+        labels = slic.getLabels()
+
+        return labels, number_sp
+    
+    def get_superpixels(self, results, size=(512, 512), ratio=5):
+        # get ori crop
+        offset_h, offset_w = self.ori_crop(results)
+        img = results['img']
+        img_shape = img.shape
+        my, mx, ry, rx, offset_y, offset_x = self.generate_multi_crop(img_shape, offset_h, offset_w, size[0], size[1], ratio=ratio)
+        mc_image = img[my:ry, mx:rx, ...]
+        assert mc_image.shape[:2] == (2560, 2560), "shape error:my:{},mx:{},ry:{},rx:{}".format(my,mx,ry,rx)
+        assert mc_image.ndim == 3 and mc_image.shape[2] == 3, "mc_image:{}".format(mc_image.shape)        # get superpixel labels
+        lab_image = cv2.cvtColor(mc_image, cv2.COLOR_RGB2LAB)
+        superpixel_labels, numebr_sp = self.slic_superpixels(lab_image)
+        # offset_y, offset_x是相对于剪裁的大图，当前剪裁在哪里
+        # offset_h, offset_w是相对于原图，当前剪裁在哪里
+        return mc_image, superpixel_labels, numebr_sp, offset_y, offset_x, offset_h, offset_w
+    
+    def get_shape(self, superpixel_label, number_sp, offset_y, offset_x):
+        '''
+        return: 3个形状和mc_image相同的黑白图像,一个索引表
+        '''
+        def find_point(seg_labels, index, coordinate):
+            if seg_labels[coordinate[0], coordinate[1]] == i:
+                return (coordinate[0], coordinate[1])
+            else:
+                component_mask = (seg_labels == index)
+                Y, X = np.where(component_mask)
+                return (X[0], Y[0])
+
+        def find_connects(connects, superpixel_label):
+            # 对几个最大的连通域，找到在大图中的位置
+            shapes = []
+            connect_nums = min(3, len(connects))
+            for i in range(connect_nums):
+                one_connect = connects[i]
+                cx, cy = one_connect[2][0], one_connect[2][1]
+                segment_label = (superpixel_label == one_connect[0]).astype(np.uint8) * 255
+                num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(segment_label, connectivity=8)
+                label_of_point = labels[cy, cx]
+                component_mask = (labels == label_of_point).astype(np.uint8) * 255
+                shapes.append(component_mask)
+            while len(shapes) < 3:
+                black_img = np.zeros_like(superpixel_label)
+                shapes.append(black_img)
+            return shapes
+
+        def find_mapindex(connects, roi_label):
+            connect_nums = min(3, len(connects))
+            mapindex_list = []
+            for i in range(connect_nums):
+                segment_index = connects[i][0]
+                connect_index = connects[i][1]
+                black_img = np.zeros_like(roi_label)
+                segment_map = (roi_label == segment_index).astype(np.uint8) * 255
+                num_labels, seg_labels, stats, centroids = cv2.connectedComponentsWithStats(segment_map, 8, cv2.CV_32S)
+                black_img[seg_labels == connect_index] = i+1
+                mapindex_list.append(black_img)
+            merge_img = np.zeros_like(roi_label)
+            for mapindex in mapindex_list:
+                merge_img = cv2.bitwise_or(merge_img, mapindex)
+            
+            return merge_img
+
+        # 遍历连通域
+        roi_label = superpixel_label[offset_y:offset_y+512, offset_x:offset_x+512]
+        connects = []
+        for i in range(number_sp):
+            segment = (roi_label == i).astype(np.uint8) * 255
+            # 检测连通域
+            num_labels, seg_labels, stats, centroids = cv2.connectedComponentsWithStats(segment, 8, cv2.CV_32S)
+            # 遍历检测出来的连通域
+            for j in range(1, num_labels):
+                c = tuple(np.int32(centroids[j]))
+                # 判断质心是否在连通域中，如果不是，就换一个点
+                c = find_point(seg_labels, j, c)
+                areas = stats[j, cv2.CC_STAT_AREA]
+                if areas > 10000:
+                    connects.append((i,j,c,areas))
+        # 按照连通域面积排序
+        connects = sorted(connects, key=lambda x:x[3], reverse=True)
+        # 获取形状
+        shapes = find_connects(connects, superpixel_label)
+        shapes = np.array(shapes)
+        zero_feature = np.zeros((1, shapes[0].shape[0], shapes[0].shape[1]))
+        shapes_features = np.concatenate((zero_feature, shapes), axis=0)
+        # 获取映射坐标
+        mapindex = find_mapindex(connects, roi_label)
+
+        return shapes_features, mapindex
+        
+    def transform(self, results: Dict) -> Dict | Tuple[List, List] | None:
+        _, superpixel_labels, numebr_sp, offset_y, offset_x, offset_h, offset_w = self.get_superpixels(results, size=(512, 512), ratio=self.multi_size)
+        shapes, mapindex = self.get_shape(superpixel_labels, numebr_sp, offset_y, offset_x)
+        ori_img = results['img']
+        ori_lbl = results['gt_seg_map']
+        results['img'] = ori_img[offset_h:offset_h+512, offset_w:offset_w+512, ...]
+        results['gt_seg_map'] = ori_lbl[offset_h:offset_h+512, offset_w:offset_w+512]
+        # [3, h, w]
+        results['shape_map'] = shapes
+        # [h, w]
+        results['shape_index'] = mapindex
+        return results
 
 @TRANSFORMS.register_module()
 class Samhq_boxes(BaseTransform):
@@ -190,63 +377,6 @@ class Samhq_boxes(BaseTransform):
     
     def __repr__(self):
         return self.__class__.__name__ + f'(crop_size={self.crop_size})'
-
-
-@TRANSFORMS.register_module()
-class Select_PureBlocks(BaseTransform):
-    """Generate pure-blocks for one class in one image. It is used for contrastive learning. 
-    Required Keys:
-    - img
-    - gt_seg_map
-
-    Add Keys:
-    - pure-blocks
-
-    Args:
-    - block-size: the pure-class block size.
-    - ignore_index
-    """
-    def __init__(self,
-                 block_size: int = 16,
-                 num_preclass: int = 4,
-                 ignore_index: int = 255) -> None:
-        super().__init__()
-        self.block_size = block_size
-        self.num_preclass = num_preclass
-        self.ignore_index = ignore_index
-    
-    def find_blocks_for_each_class(self, class_num, img, label):
-        boxes_list = []
-        cls_indices = np.where(label==class_num)
-        # np.where返回的是满足条件的行索引和列索引，返回的是行列两个数组。
-        zipped_indices = list(zip(cls_indices[0], cls_indices[1]))
-        np.random.shuffle(zipped_indices)
-        for i, (row, col) in enumerate(zipped_indices):
-            if len(boxes_list) >= self.num_preclass or i > 1000:
-                # 如果已经找到了规定数量的box，结束
-                break
-            if row+self.block_size <= label.shape[0] and col + self.block_size <= label.shape[1]:
-                box = [row, col]
-                block = label[row:row+self.block_size, col:col+self.block_size]
-                if np.all(block == class_num):
-                    boxes_list.append(box)
-        
-        return boxes_list
-
-    def transform(self, results: Dict) -> Dict | Tuple[List, List] | None:
-        block_list = {}
-        image = results['img']
-        label = results['gt_seg_map']
-        unique_classes = np.unique(label)
-        for unique_class in unique_classes:
-            if unique_class == self.ignore_index:
-                continue
-            unique_class_boxes = self.find_blocks_for_each_class(unique_class, image, label)
-            # there should be at least two blocks for one class.
-            if len(unique_class_boxes) >= 2:
-                block_list[unique_class] = unique_class_boxes
-        results['pure_blocks'] = block_list
-        return results
 
 
 @TRANSFORMS.register_module()
