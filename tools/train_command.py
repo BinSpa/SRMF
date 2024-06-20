@@ -11,6 +11,7 @@ bash torchrun_train.sh ../configs/deeplabv3plus/deeplabv3plus_r101-d8_4xb4-160k_
 # swin-base
 bash torchrun_train.sh ../configs/swin/swin-base-patch4-window7-fbp-512x512.py 2 --work-dir ../../mmseg_exp/swinbase_fbp
 bash torchrun_train.sh ../configs/swin/swin-base-patch4-window7-urur-512x512.py 2 --work-dir ../../mmseg_exp/swinbase_urur
+bash torchrun_train.sh ../configs/swin/swin-base-patch4-window7-gid-512x512.py 2 --work-dir ../../mmseg_exp/swinbase_gid
 # mc exp
 bash torchrun_train.sh ../configs/multicropnet/segformer_mit-b5_8xb2-160k_gid-512x512-ce.py 1 --work-dir /data9/gyl/RS_Code/mmseg_exp/mcgid_ce
 bash torchrun_train.sh ../configs/multicropnet/segformer_mit-b5_8xb2-160k_urur-512x512-ce.py 1 --work-dir /data9/gyl/RS_Code/mmseg_exp/mcurur_ce
