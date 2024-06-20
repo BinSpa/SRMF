@@ -14,8 +14,8 @@ model = dict(
     backbone=dict(depth=101),
     test_cfg = dict(mode='slide',crop_size=(512, 512),  stride=(341, 341)))
 
-train_dataloader = dict(batch_size=16, num_workers=10)
-test_dataloader = dict(batch_size=4, num_workers=4)
+train_dataloader = dict(batch_size=8, num_workers=10)
+test_dataloader = dict(batch_size=2, num_workers=4)
 
 
 train_cfg = dict(
