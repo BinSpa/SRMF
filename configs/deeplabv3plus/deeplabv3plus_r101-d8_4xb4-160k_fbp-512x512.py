@@ -20,9 +20,9 @@ val_dataloader = test_dataloader
 
 
 train_cfg = dict(
-    type='IterBasedTrainLoop', max_iters=160000, val_interval=50)
+    type='IterBasedTrainLoop', max_iters=160000, val_interval=16000)
 
 default_hooks = dict(
-    checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=50),
-    logger=dict(type='LoggerHook', interval=50, log_metric_by_epoch=False),
+    checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=16000),
+    logger=dict(type='LoggerHook', interval=1000, log_metric_by_epoch=False),
 )
