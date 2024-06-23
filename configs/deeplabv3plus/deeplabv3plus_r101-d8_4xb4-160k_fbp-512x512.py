@@ -15,12 +15,13 @@ model = dict(
     test_cfg = dict(mode='slide',crop_size=(512, 512),  stride=(341, 341)))
 
 train_dataloader = dict(batch_size=8, num_workers=10)
-test_dataloader = dict(batch_size=2, num_workers=4)
+test_dataloader = dict(batch_size=1, num_workers=4)
 
 
 train_cfg = dict(
-    type='IterBasedTrainLoop', max_iters=160000, val_interval=16000)
+    type='IterBasedTrainLoop', max_iters=160000, val_interval=50)
 
 default_hooks = dict(
-    checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=16000),
+    checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=50),
+    logger=dict(type='LoggerHook', interval=50, log_metric_by_epoch=False),
 )
