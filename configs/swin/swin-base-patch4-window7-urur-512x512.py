@@ -17,7 +17,8 @@ model = dict(
         drop_path_rate=0.3,
         patch_norm=True),
     decode_head=dict(in_channels=[128, 256, 512, 1024], num_classes=8),
-    auxiliary_head=dict(in_channels=512, num_classes=8))
+    auxiliary_head=dict(in_channels=512, num_classes=8),
+    test_cfg = dict(mode='slide',crop_size=(512, 512),  stride=(341, 341)))
 
 # AdamW optimizer, no weight decay for position embedding & layer norm
 # in backbone
@@ -50,3 +51,12 @@ param_scheduler = [
 train_dataloader = dict(batch_size=8,num_workers=10)
 val_dataloader = dict(batch_size=2,num_workers=2)
 test_dataloader = val_dataloader
+
+# train cfg and default hooks
+train_cfg = dict(
+    type='IterBasedTrainLoop', max_iters=160000, val_interval=50)
+
+default_hooks = dict(
+    checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=50),
+    logger=dict(type='LoggerHook', interval=50, log_metric_by_epoch=False),
+)
