@@ -14,6 +14,10 @@ model = dict(
     backbone=dict(depth=101),
     test_cfg = dict(mode='slide',crop_size=(512, 512),  stride=(341, 341)))
 
+train_dataloader = dict(batch_size=8, num_workers=10)
+test_dataloader = dict(batch_size=2, num_workers=4)
+val_dataloader = test_dataloader
+
 train_cfg = dict(
     type='IterBasedTrainLoop', max_iters=160000, val_interval=2000)
 
