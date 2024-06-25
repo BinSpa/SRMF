@@ -103,7 +103,7 @@ class SegLocalVisualizer(Visualizer):
                       sem_seg: PixelData,
                       classes: Optional[List],
                       palette: Optional[List],
-                      with_labels: Optional[bool] = True) -> np.ndarray:
+                      with_labels: Optional[bool] = False) -> np.ndarray:
         """Draw semantic seg of GT or prediction.
 
         Args:

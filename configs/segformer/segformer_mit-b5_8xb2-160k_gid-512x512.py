@@ -50,7 +50,7 @@ default_hooks = dict(
     checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=16000),
 )
 
-check_layers = ['decode']
-custom_hooks = [
-    dict(type='CheckGradHook', check_layers=check_layers)
-]
+# test visualizer
+vis_backends = [dict(type='LocalVisBackend')]
+visualizer = dict(
+    type='SegLocalVisualizer', vis_backends=vis_backends, name='visualizer', alpha=1.0)

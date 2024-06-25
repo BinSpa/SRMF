@@ -78,10 +78,3 @@ default_hooks = dict(
     logger=dict(type='LoggerHook', interval=1000, log_metric_by_epoch=False),
     checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=16000),
 )
-
-'''
-check_layers = ['decode']
-custom_hooks = [
-    dict(type='CheckGradHook', check_layers=check_layers)
-]
-'''
