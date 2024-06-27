@@ -259,6 +259,7 @@ class Samhq_boxes(BaseTransform):
     - select_num: select boxes number for every image
     - img_size: resized target
     - scale_ratio: scale the boxes for more abundant features
+    - ifmc: if need multicrop, this parameter determines whether img is updated in this function or in the multicrop function
     - keep_gsd: whether resize boxes to img_size, or crop boxes to match img_size for keep the gsd
     """
     def __init__(self, 
@@ -306,7 +307,9 @@ class Samhq_boxes(BaseTransform):
         if self.ifmc == True:
             select_boxes = boxes[:self.select_num]
         elif self.ifmc == False:
-            select_boxes = self.exp_decay_sample_norm(boxes, k=self.select_num)
+            arr = np.arange(len(boxes))
+            select_indexs = self.weighted_random_sampling(arr, self.select_num)
+            select_boxes = [boxes[index] for index in select_indexs]
         for box in select_boxes:
             x,y,w,h = box["coordinates"]
             x,y,w,h = self.enlarge_box(x,y,w,h)
@@ -316,6 +319,37 @@ class Samhq_boxes(BaseTransform):
                 # resize cropped img to target size
                 resized_img = cv2.resize(cropped_img, (self.img_size[0], self.img_size[1]), interpolation=cv2.INTER_LINEAR)
                 resized_gt = cv2.resize(cropped_gt, (self.img_size[0], self.img_size[1]), interpolation=cv2.INTER_NEAREST)
+                # handle different sizes
+                if h < self.img_size[0] and w < self.img_size[1]:
+                    # Center Expansion
+                    centric_y, centric_x = y + h/2, w + w/2
+                    new_x = max(0, centric_x - self.img_size[1] / 2)
+                    new_y = max(0, centric_y - self.img_size[0] / 2)
+                    if new_x + self.img_size[1] > ori_img.size[1]:
+                        new_x = ori_img[1] - self.img_size[1]
+                    if new_y + self.img_size[0] > ori_img.size[0]:
+                        new_y = ori_img[0] - self.img_size[0]
+                if h >= self.img_size[0] and w < self.img_size[1]:
+                    new_y = y
+                    new_x = x
+                    if new_x + self.img_size[1] > ori_img.size[1]:
+                        new_x = ori_img[1] - self.img_size[1]
+                if h < self.img_size[0] and w >= self.img_size[1]:
+                    new_y = y
+                    new_x = x
+                    if new_y + self.img_size[0] > ori_img.size[0]:
+                        new_y = ori_img[0] - self.img_size[0]
+                if h >= self.img_size[0] and w >= self.img_size[1]:
+                    # centric crop
+                    centric_y, centric_x = y + h/2, w + w/2
+                    new_x = centric_x - self.img_size[1] / 2
+                    new_y = centric_y - self.img_size[0] / 2
+                keepgsd_img = ori_img[new_y:new_y+self.img_size[0], new_x:new_x+self.img_size[1], ...]
+                keepgsd_gt = ori_gt[new_y:new_y+self.img_size[0], new_x:new_x+self.img_size[1]]
+                cropped_imgs.append(resized_img)
+                cropped_imgs.append(keepgsd_img)
+                cropped_gts.append(resized_gt)
+                cropped_gts.append(keepgsd_gt)
             else:
                 # crop img to target size
                 if y + self.img_size[0] > ori_h:
@@ -332,17 +366,20 @@ class Samhq_boxes(BaseTransform):
                     end_x = x + self.img_size[1]
                 resized_img = ori_img[start_y:end_y, start_x:end_x, ...]
                 resized_gt = ori_gt[start_y:end_y, start_x:end_x]
-            cropped_imgs.append(resized_img)
-            cropped_gts.append(resized_gt)
+                cropped_imgs.append(resized_img)
+                cropped_gts.append(resized_gt)
         
         return np.stack(cropped_imgs, axis=0), np.stack(cropped_gts, axis=0)
 
-    def exp_decay_sample_norm(self, boxes, k=8, decay_rate=0.155):
-        weights = np.exp(-decay_rate * np.arange(len(boxes)))
-        normalized_weights = weights / np.sum(weights)
-        indices = random.choice(len(boxes), size=k, p=normalized_weights)
-        select_items = [boxes[indice] for indice in indices]
-        return select_items
+    def weighted_random_sampling(self, arr, x, arr_len_factor=0.07):
+        arr_len = len(arr)
+        some_constant = arr_len * arr_len_factor
+        weights = 1 / (np.arange(arr_len) + some_constant)
+        
+        probabilities = weights / weights.sum()
+        sampled_elements = np.random.choice(arr, size=x, p=probabilities, replace=True)
+        
+        return sampled_elements
 
     def transform(self, results: Dict) -> Dict | Tuple[List, List] | None:
         img_path = results["img_path"]
