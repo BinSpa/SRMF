@@ -48,9 +48,10 @@ train_cfg = dict(
 
 default_hooks = dict(
     checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=16000),
+    visualization=dict(type='SegVisualizationHook', draw=True, interval=1)
 )
 
 # test visualizer
 vis_backends = [dict(type='LocalVisBackend')]
 visualizer = dict(
-    type='SegLocalVisualizer', vis_backends=vis_backends, name='visualizer', alpha=1.0)
+    type='SegLocalVisualizer', vis_backends=vis_backends, name='visualizer', save_dir='/home/rsr/gyl/RS_Code/mmseg_exp/segformerb5_gid', alpha=1.0)
