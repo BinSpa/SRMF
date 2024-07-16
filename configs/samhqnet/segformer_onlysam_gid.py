@@ -5,18 +5,9 @@ _base_ = [
 
 # import jsonlines as jl
 
-record_path = '/data9/gyl/RS_DATASET/boxes_jsonl/gid_record.jsonl'
-boxes_path = '/data9/gyl/RS_DATASET/boxes_jsonl/gid_boxes.jsonl'
-'''
-img_infos = []
-with jl.open(record_path, 'r') as f:
-    for line in f:
-        record = line
+record_path = '/data1/gyl/RS_DATASET/boxes_jsonl/gid_record.jsonl'
+boxes_path = '/data1/gyl/RS_DATASET/boxes_jsonl/gid_boxes.jsonl'
 
-with jl.open(boxes_path, 'r') as f:
-    for line in f:
-        img_infos.append(line)
-'''
 crop_size = (512, 512)
 
 data_preprocessor = dict(

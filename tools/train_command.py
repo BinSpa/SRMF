@@ -32,19 +32,14 @@ bash torchrun_train.sh ../configs/mctextnet/segformer-b2_urur_proto_lk.py 1 --wo
 bash torchrun_train.sh /mnt/data/nas/gyl/RS_Code/mmsegmentation/configs/mcfusionnet/segformer_mit-b5_8xb2-160k_gid-512x512.py 1 --work-dir /mnt/data/nas/gyl/RS_Code/mmseg_exp/mcfusion_gid
 bash torchrun_train.sh /mnt/data/nas/gyl/RS_Code/mmsegmentation/configs/mcfusionnet/segformer_mit-b5_8xb2-160k_urur-512x512.py 1 --work-dir /mnt/data/nas/gyl/RS_Code/mmseg_exp/mcfusion_urur
 bash torchrun_train.sh /home/rsr/gyl/RS_Code/mmsegmentation/configs/mcfusionnet/segformer_mit-b5_8xb2-160k_gid-512x512_onlyfusion.py 1 --work-dir /home/rsr/gyl/RS_Code/mmseg_exp/onlyfusion_gid
-
-# pureblock contrassive learning
-bash torchrun_train.sh ../configs/pureblockclnet/segformer_mit-b5_8xb2-160k_gid-512x512.py 1 --work-dir /home/rsr/gyl/RS_Code/mmseg_exp/pureblock_4_gid
-bash torchrun_train.sh ../configs/pureblockclnet/segformer_mit-b5_8xb2-160k_urur-512x512.py 1 --work-dir /mnt/data/nas/gyl/RS_Code/mmseg_exp/pureblock_4_urur
-# amsoftmax pb contrassive
-bash torchrun_train.sh ../configs/pureblockclnet/segformer_mit-b5_8xb2-160k_urur-512x512.py 2 --work-dir /data9/gyl/RS_Code/mmseg_exp/pbams_16_urur
-bash torchrun_train.sh ../configs/pureblockclnet/segformer_mit-b5_8xb2-160k_gid-512x512.py 1 --work-dir /data9/gyl/RS_Code/mmseg_exp/pbams_16_urur
 # onlyfusion
 bash torchrun_train.sh /data9/gyl/RS_Code/mmsegmentation/configs/onlyfusion/segformer_mit-b5_8xb2-160k_gid-512x512_onlyfusion.py 1 --work-dir /data9/gyl/RS_Code/mmseg_exp/segformer_gid_onlyfusion
 bash torchrun_train.sh /data9/gyl/RS_Code/mmsegmentation/configs/onlyfusion/segformer_mit-b5_8xb2-160k_urur-512x512_onlyfusion.py 1 --work-dir /data9/gyl/RS_Code/mmseg_exp/segformer_urur_onlyfusion
 # sam 
 bash torchrun_train.sh ../configs/samhqnet/segformer_gid.py 1 --work-dir /data9/gyl/RS_Code/mmseg_exp/samhq_gid
 bash torchrun_train.sh ../configs/samhqnet/segformer_urur.py 1 --work-dir /data9/gyl/RS_Code/mmseg_exp/samhq_urur
-# soft label
-bash torchrun_train.sh ../configs/mctextnet/segformer_gid_softlabel.py 2 --work-dir ../../mmseg_exp/softlabel_gid
-bash torchrun_train.sh ../configs/mctextnet/segformer_urur_softlabel.py 2 --work-dir n../../mmseg_exp/softlabel_urur
+bash torchrun_train.sh ../configs/samhqnet/segformer_fbp.py 1 --work-dir /data9/gyl/RS_Code/mmseg_exp/samhq_fbp
+# only sam
+bash torchrun_train.sh ../configs/samhqnet/segformer_onlysam_gid.py 2 --work-dir /data1/gyl/RS_Code/mmseg_exp/onlysam_gid
+bash torchrun_train.sh ../configs/samhqnet/segformer_onlysam_fbp.py 2 --work-dir /data1/gyl/RS_Code/mmseg_exp/onlysam_fbp
+bash torchrun_train.sh ../configs/samhqnet/segformer_onlysam_urur.py 2 --work-dir /data1/gyl/RS_Code/mmseg_exp/onlysam_urur
