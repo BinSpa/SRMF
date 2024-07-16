@@ -5,7 +5,7 @@ _base_ = [
 
 # import jsonlines as jl
 
-record_path = '/data9/gyl/RS_DATASET/boxes_jsonl/gid_record.jsonl'
+record_path = '/data1/gyl/RS_DATASET/boxes_jsonl/gid_record.jsonl'
 boxes_path = '/data1/gyl/RS_DATASET/boxes_jsonl/fbp_boxes.jsonl'
 
 crop_size = (512, 512)
