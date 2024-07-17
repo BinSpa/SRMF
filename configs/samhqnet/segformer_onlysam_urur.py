@@ -57,13 +57,12 @@ param_scheduler = [
     )
 ]
 
-record_path = '/data9/gyl/RS_DATASET/boxes_jsonl/urur_record.jsonl'
 boxes_path = '/data9/gyl/RS_DATASET/boxes_jsonl/urur_boxes.jsonl'
 
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations'),
-    dict(type='Samhq_boxes', boxes_path=boxes_path, record_path=record_path, select_num=1, keep_gsd=False, ifmc=False),
+    dict(type='Samhq_boxes', boxes_path=boxes_path, select_num=1, keep_gsd=False, ifmc=False),
     # dict(type='RandomCrop', crop_size=crop_size, cat_max_ratio=0.75),
     dict(type='RandomFlip', prob=0.8, direction=['horizontal', 'vertical']),
     # dict(type='MultiLevelCrop', crop_size=crop_size, cat_max_ratio=0.75, level_list=[1,2,3,4]),

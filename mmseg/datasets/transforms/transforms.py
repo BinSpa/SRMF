@@ -255,7 +255,6 @@ class Samhq_boxes(BaseTransform):
 
     Args:
     - boxes_path
-    - record_path
     - select_num: select boxes number for every image
     - img_size: resized target
     - scale_ratio: scale the boxes for more abundant features
@@ -264,15 +263,13 @@ class Samhq_boxes(BaseTransform):
     """
     def __init__(self, 
                  boxes_path: str = None,
-                 record_path: str = None,
-                 select_num: int = 4,
+                 select_num: int = 1,
                  img_size: tuple = (512,512),
                  scale_ratio: float = 1.2,
                  ifmc: bool = True,
                  keep_gsd: bool = False) -> None:
         super().__init__()
         self.boxes_path = boxes_path
-        self.record_path = record_path
         self.select_num = select_num
         self.img_size = img_size
         self.scale_ratio = scale_ratio
@@ -384,22 +381,14 @@ class Samhq_boxes(BaseTransform):
     def transform(self, results: Dict) -> Dict | Tuple[List, List] | None:
         img_path = results["img_path"]
         img_name = img_path.split('/')[-1]
-        record = dict()
         img_info = dict()
-        with jl.open(self.record_path, 'r') as f:
-            for line in f:
-                record = line
-        index = record[img_name]
         with jl.open(self.boxes_path, 'r') as f:
             for i, line in enumerate(f):
-                if index == i:
+                # image name is the id
+                if line["image_name"] == img_name:
                     img_info = line
                     break
-        boxes = img_info["boxes"]  
-        '''
-        index = self.record_path[img_name]
-        boxes = self.boxes_path[index]["boxes"]
-        '''      
+        boxes = img_info["boxes"]      
         ori_img = results["img"]
         ori_gt = results["gt_seg_map"]
         stacked_img, stacked_gt = self.crop_img(boxes, ori_img, ori_gt)

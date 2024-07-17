@@ -5,7 +5,6 @@ _base_ = [
 
 # import jsonlines as jl
 
-record_path = '/data1/gyl/RS_DATASET/boxes_jsonl/gid_record.jsonl'
 boxes_path = '/data1/gyl/RS_DATASET/boxes_jsonl/gid_boxes.jsonl'
 
 crop_size = (512, 512)
@@ -59,7 +58,7 @@ param_scheduler = [
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations'),
-    dict(type='Samhq_boxes', boxes_path=boxes_path, record_path=record_path, select_num=1, keep_gsd=False, ifmc=False),
+    dict(type='Samhq_boxes', boxes_path=boxes_path, select_num=1, keep_gsd=False, ifmc=False),
     # dict(type='RandomCrop', crop_size=crop_size, cat_max_ratio=0.75),
     dict(type='RandomFlip', prob=0.8, direction=['horizontal', 'vertical']),
     # dict(type='MultiLevelCrop', crop_size=crop_size, cat_max_ratio=0.75, level_list=[1,2,3,4], withlocal=False),
