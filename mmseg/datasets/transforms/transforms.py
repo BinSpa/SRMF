@@ -322,7 +322,7 @@ class Samhq_boxes(BaseTransform):
                 # handle different sizes
                 if h < self.img_size[0] and w < self.img_size[1]:
                     # Center Expansion
-                    centric_y, centric_x = y + h/2, w + w/2
+                    centric_y, centric_x = int(y + h//2), int(x + w//2)
                     new_x = max(0, centric_x - self.img_size[1] // 2)
                     new_y = max(0, centric_y - self.img_size[0] // 2)
                     if new_x + self.img_size[1] > ori_img.shape[1]:
@@ -341,7 +341,7 @@ class Samhq_boxes(BaseTransform):
                         new_y = ori_img[0] - self.img_size[0]
                 if h >= self.img_size[0] and w >= self.img_size[1]:
                     # centric crop
-                    centric_y, centric_x = y + h//2, w + w//2
+                    centric_y, centric_x = int(y + h//2), int(x + w//2)
                     new_x = centric_x - self.img_size[1] // 2
                     new_y = centric_y - self.img_size[0] // 2
                 keepgsd_img = ori_img[new_y:new_y+self.img_size[0], new_x:new_x+self.img_size[1], ...]
