@@ -365,7 +365,9 @@ class Samhq_boxes(BaseTransform):
                 resized_gt = ori_gt[start_y:end_y, start_x:end_x]
                 cropped_imgs.append(resized_img)
                 cropped_gts.append(resized_gt)
-        
+        for cropped_img in cropped_imgs:
+            if cropped_img.shape[0] != 512 or cropped_img.shape[1] !=512:
+                assert False, "wrong image shape:{}".format(cropped_img.shape)
         return np.stack(cropped_imgs, axis=0), np.stack(cropped_gts, axis=0)
 
     def weighted_random_sampling(self, arr, x, arr_len_factor=0.07):
