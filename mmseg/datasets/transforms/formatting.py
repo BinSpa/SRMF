@@ -34,6 +34,7 @@ class PackSegMultiInputs(BaseTransform):
                 sample.
         """
         packed_results = dict()
+        assert False, "img shape:{}, lbl shape:{}".format(results['img'].shape, results['gt_seg_map'].shape)
         if 'img' in results:
             img = results['img']
             if len(img.shape) < 4:
