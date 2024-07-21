@@ -152,7 +152,6 @@ class MultiSegDataPreProcessor(BaseDataPreprocessor):
                 inputs=inputs,
                 data_samples=data_samples
             )
-            assert False, "inputs shape is {}".format(inputs.shape)
             if self.batch_augments is not None:
                 inputs, data_samples = self.batch_augments(
                     inputs, data_samples)
