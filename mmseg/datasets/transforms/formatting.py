@@ -34,7 +34,6 @@ class PackSegMultiInputs(BaseTransform):
                 sample.
         """
         packed_results = dict()
-        assert False, "img shape:{}, lbl shape:{}".format(results['img'].shape, results['gt_seg_map'].shape)
         if 'img' in results:
             img = results['img']
             if len(img.shape) < 4:
@@ -238,7 +237,6 @@ class PackSegShapeInputs(BaseTransform):
             packed_results['inputs'] = img
 
         data_sample = SegDataSample()
-        # assert False, "results:{}".format(results.keys())
         if 'gt_seg_map' in results:
             if len(results['gt_seg_map'].shape) == 2:
                 data = to_tensor(results['gt_seg_map'][None,
