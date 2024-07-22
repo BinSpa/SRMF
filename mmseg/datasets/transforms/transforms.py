@@ -322,11 +322,11 @@ class Samhq_boxes(BaseTransform):
                 if h < self.img_size[0] and w < self.img_size[1]:
                     # Center Expansion
                     # Introduce randomness
-                    new_x, new_y = random.randint(rd_x-self.img_size[1], x), random.randint(rd_y-self.img_size[0], y)
+                    new_x, new_y = random.randint(max(rd_x-self.img_size[1], 0), x), random.randint(max(rd_y-self.img_size[0], 0), y)
                 if h >= self.img_size[0] and w < self.img_size[1]:
-                    new_x, new_y = random.randint(rd_x-self.img_size[1], x), random.randint(y, rd_y-self.img_size[0])
+                    new_x, new_y = random.randint(max(rd_x-self.img_size[1], 0), x), random.randint(y, rd_y-self.img_size[0])
                 elif h < self.img_size[0] and w >= self.img_size[1]:
-                    new_x, new_y = random.randint(x, rd_x-self.img_size[1]), random.randint(rd_y-self.img_size[0], y)
+                    new_x, new_y = random.randint(x, rd_x-self.img_size[1]), random.randint(max(rd_y-self.img_size[0], 0), y)
                 elif h >= self.img_size[0] and w >= self.img_size[1]:
                     new_x, new_y = random.randint(x, rd_x-self.img_size[1]), random.randint(y, rd_y-self.img_size[0])
                 elif new_x + self.img_size[1] > ori_w:
