@@ -28,6 +28,7 @@ from collections import Counter
 from num2words import num2words
 
 from IPython import embed
+import random
 
 try:
     import albumentations
@@ -310,6 +311,7 @@ class Samhq_boxes(BaseTransform):
         for box in select_boxes:
             x,y,w,h = box["coordinates"]
             x,y,w,h = self.enlarge_box(x,y,w,h)
+            rd_x, rd_y = x + w, y + h
             cropped_img = ori_img[y:min(ori_h, y+h), x:min(ori_w, x+w), ...]
             cropped_gt = ori_gt[y:min(ori_h, y+h), x:min(ori_w, x+w)]
             if self.keep_gsd == False:
@@ -319,28 +321,18 @@ class Samhq_boxes(BaseTransform):
                 # handle different sizes
                 if h < self.img_size[0] and w < self.img_size[1]:
                     # Center Expansion
-                    centric_y, centric_x = int(y + h//2), int(x + w//2)
-                    new_x = max(0, centric_x - self.img_size[1] // 2)
-                    new_y = max(0, centric_y - self.img_size[0] // 2)
-                    if new_x + self.img_size[1] > ori_img.shape[1]:
-                        new_x = ori_img.shape[1] - self.img_size[1]
-                    if new_y + self.img_size[0] > ori_img.shape[0]:
-                        new_y = ori_img.shape[0] - self.img_size[0]
+                    # Introduce randomness
+                    new_x, new_y = random.randint(rd_x-self.img_size[1], x), random.randint(rd_y-self.img_size[0], y)
                 if h >= self.img_size[0] and w < self.img_size[1]:
-                    new_y = y
-                    new_x = x
-                    if new_x + self.img_size[1] > ori_img.shape[1]:
-                        new_x = ori_img.shape[1] - self.img_size[1]
+                    new_x, new_y = random.randint(rd_x-self.img_size[1], x), random.randint(y, rd_y-self.img_size[0])
                 if h < self.img_size[0] and w >= self.img_size[1]:
-                    new_y = y
-                    new_x = x
-                    if new_y + self.img_size[0] > ori_img.shape[0]:
-                        new_y = ori_img.shape[0] - self.img_size[0]
+                    new_x, new_y = random.randint(x, rd_x-self.img_size[1]), random.randint(rd_y-self.img_size[0], y)
                 if h >= self.img_size[0] and w >= self.img_size[1]:
-                    # centric crop
-                    centric_y, centric_x = int(y + h//2), int(x + w//2)
-                    new_x = centric_x - self.img_size[1] // 2
-                    new_y = centric_y - self.img_size[0] // 2
+                    new_x, new_y = random.randint(x, rd_x-self.img_size[1]), random.randint(y, rd_y-self.img_size[0])
+                if new_x + self.img_size[1] > ori_img.shape[1]:
+                    new_x = ori_img.shape[1] - self.img_size[1]
+                if new_y + self.img_size[0] > ori_img.shape[0]:
+                    new_y = ori_img.shape[0] - self.img_size[0]
                 keepgsd_img = ori_img[new_y:new_y+self.img_size[0], new_x:new_x+self.img_size[1], ...]
                 keepgsd_gt = ori_gt[new_y:new_y+self.img_size[0], new_x:new_x+self.img_size[1]]
                 cropped_imgs.append(resized_img)
