@@ -72,8 +72,8 @@ test_pipeline = [
     dict(type='PackSegInputs')
 ]
 
-train_dataloader = dict(batch_size=8, num_workers=12, dataset=dict(pipeline=train_pipeline))
-val_dataloader = dict(batch_size=1, num_workers=4, dataset=dict(pipeline=test_pipeline))
+train_dataloader = dict(batch_size=8, num_workers=10, dataset=dict(pipeline=train_pipeline))
+val_dataloader = dict(batch_size=1, num_workers=2, dataset=dict(pipeline=test_pipeline))
 test_dataloader = val_dataloader
 
 train_cfg = dict(
