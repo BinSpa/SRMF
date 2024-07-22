@@ -325,14 +325,14 @@ class Samhq_boxes(BaseTransform):
                     new_x, new_y = random.randint(rd_x-self.img_size[1], x), random.randint(rd_y-self.img_size[0], y)
                 if h >= self.img_size[0] and w < self.img_size[1]:
                     new_x, new_y = random.randint(rd_x-self.img_size[1], x), random.randint(y, rd_y-self.img_size[0])
-                if h < self.img_size[0] and w >= self.img_size[1]:
+                elif h < self.img_size[0] and w >= self.img_size[1]:
                     new_x, new_y = random.randint(x, rd_x-self.img_size[1]), random.randint(rd_y-self.img_size[0], y)
-                if h >= self.img_size[0] and w >= self.img_size[1]:
+                elif h >= self.img_size[0] and w >= self.img_size[1]:
                     new_x, new_y = random.randint(x, rd_x-self.img_size[1]), random.randint(y, rd_y-self.img_size[0])
-                if new_x + self.img_size[1] > ori_img.shape[1]:
-                    new_x = ori_img.shape[1] - self.img_size[1]
-                if new_y + self.img_size[0] > ori_img.shape[0]:
-                    new_y = ori_img.shape[0] - self.img_size[0]
+                elif new_x + self.img_size[1] > ori_w:
+                    new_x = ori_w - self.img_size[1]
+                elif new_y + self.img_size[0] > ori_h:
+                    new_y = ori_h - self.img_size[0]
                 keepgsd_img = ori_img[new_y:new_y+self.img_size[0], new_x:new_x+self.img_size[1], ...]
                 keepgsd_gt = ori_gt[new_y:new_y+self.img_size[0], new_x:new_x+self.img_size[1]]
                 cropped_imgs.append(resized_img)
@@ -358,7 +358,7 @@ class Samhq_boxes(BaseTransform):
                 cropped_imgs.append(resized_img)
                 cropped_gts.append(resized_gt)
         for cropped_img in cropped_imgs:
-            if cropped_img.shape[0] != 512 or cropped_img.shape[1] !=512:
+            if cropped_img.shape[0] != 512 or cropped_img.shape[1] != 512:
                 assert False, "wrong image shape:{}".format(cropped_img.shape)
         return np.stack(cropped_imgs, axis=0), np.stack(cropped_gts, axis=0)
 
