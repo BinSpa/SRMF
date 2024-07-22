@@ -329,9 +329,9 @@ class Samhq_boxes(BaseTransform):
                     new_x, new_y = random.randint(x, rd_x-self.img_size[1]), random.randint(max(rd_y-self.img_size[0], 0), y)
                 elif h >= self.img_size[0] and w >= self.img_size[1]:
                     new_x, new_y = random.randint(x, rd_x-self.img_size[1]), random.randint(y, rd_y-self.img_size[0])
-                elif new_x + self.img_size[1] > ori_w:
+                if new_x + self.img_size[1] > ori_w:
                     new_x = ori_w - self.img_size[1]
-                elif new_y + self.img_size[0] > ori_h:
+                if new_y + self.img_size[0] > ori_h:
                     new_y = ori_h - self.img_size[0]
                 keepgsd_img = ori_img[new_y:new_y+self.img_size[0], new_x:new_x+self.img_size[1], ...]
                 keepgsd_gt = ori_gt[new_y:new_y+self.img_size[0], new_x:new_x+self.img_size[1]]
