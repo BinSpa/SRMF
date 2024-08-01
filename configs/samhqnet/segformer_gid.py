@@ -3,7 +3,7 @@ _base_ = [
     '../_base_/default_runtime.py', '../_base_/schedules/schedule_160k.py'
 ]
 
-boxes_path = '/data9/gyl/RS_DATASET/boxes_jsonl/gid_boxes.jsonl'
+boxes_path = '/data1/gyl/RS_DATASET/boxes_jsonl/gid_boxes.jsonl'
 
 crop_size = (512, 512)
 
