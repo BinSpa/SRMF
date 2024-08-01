@@ -25,9 +25,9 @@ model = dict(
         embed_dims=64,
         num_heads=[1, 2, 5, 8],
         num_layers=[3, 6, 40, 3]),
-    decode_head=dict(type='MultiCrop_SegformerHead', in_channels=[64, 128, 320, 512], num_classes=6),
-    # test_cfg = dict(mode='slide',crop_size=(512, 512),  stride=(341, 341)))
-    test_cfg = dict(mode='oc_slide',crop_size=(512, 512),  stride=(341, 341)))
+    decode_head=dict(type='MultiCrop_SegformerHead', in_channels=[64, 128, 320, 512], num_classes=25),
+    test_cfg=dict(mode='slide',crop_size=(512, 512),  stride=(341, 341)))
+    # test_cfg=dict(mode='oc_slide',crop_size=(512, 512),  stride=(341, 341)))
 
 optim_wrapper = dict(
     _delete_=True,

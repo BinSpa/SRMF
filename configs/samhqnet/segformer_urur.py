@@ -30,7 +30,8 @@ model = dict(
         num_heads=[1, 2, 5, 8],
         num_layers=[3, 6, 40, 3]),
     decode_head=dict(type='MultiCrop_SegformerHead', in_channels=[64, 128, 320, 512], num_classes=8),
-    test_cfg = dict(mode='slide',crop_size=(512, 512),  stride=(341, 341)))
+    # test_cfg = dict(mode='slide',crop_size=(512, 512),  stride=(341, 341)))
+    test_cfg = dict(mode='oc_slide',crop_size=(512, 512),  stride=(341, 341)))
 
 optim_wrapper = dict(
     _delete_=True,
@@ -57,14 +58,13 @@ param_scheduler = [
     )
 ]
 
-record_path = '/data9/gyl/RS_DATASET/boxes_jsonl/urur_record.jsonl'
 boxes_path = '/data9/gyl/RS_DATASET/boxes_jsonl/urur_boxes.jsonl'
 
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations'),
-    dict(type='ColorJittering'),
-    dict(type='Samhq_boxes', boxes_path=boxes_path, record_path=record_path, select_num=4, keep_gsd=True),
+    # dict(type='ColorJittering'),
+    dict(type='Samhq_boxes', boxes_path=boxes_path, select_num=4, keep_gsd=True, ifmc=True),
     # dict(type='RandomCrop', crop_size=crop_size, cat_max_ratio=0.75),
     dict(type='RandomFlip', prob=0.8, direction=['horizontal', 'vertical']),
     dict(type='MultiLevelCrop', crop_size=crop_size, cat_max_ratio=0.75, level_list=[1,2,3,4]),

@@ -2,6 +2,7 @@
 import logging
 from typing import List, Optional
 
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from mmengine.logging import print_log
@@ -11,6 +12,8 @@ from mmseg.registry import MODELS
 from mmseg.utils import (ConfigType, OptConfigType, OptMultiConfig,
                          OptSampleList, SampleList, add_prefix)
 from .base import BaseSegmentor
+import numpy as np
+import cv2
 
 
 @MODELS.register_module()
@@ -238,6 +241,56 @@ class EncoderDecoder(BaseSegmentor):
         x = self.extract_feat(inputs)
         return self.decode_head.forward(x)
 
+    def oc_slide_inference(self, inputs:Tensor,
+                           batch_img_metas: List[dict]) -> Tensor:
+        """
+        Inference by sliding-window with overlap.
+        After this, object centric strategy is used to optimize the segmentation result.
+        We conducted connected component analysis on the results to identify larger connected domain features, 
+        which were marked with rectangular boxes. Regions with a length or width exceeding 512*3 were subject 
+        to scale normalization followed by re-inference to obtain new logits. 
+        These new logits were then combined with the original logits of the area through a weighted merging process
+        to derive the final logits results.
+        We only support batch size=1 now.
+        """
+        # crop_pre_logits:(b,c,h,w)
+        crop_pred_logits = self.slide_inference(inputs, batch_img_metas)
+        # crop_pred_results:(b,h,w)
+        _, crop_pred_results = torch.max(crop_pred_logits, dim=1)
+        np_crop_pred_results = crop_pred_results.detach().cpu().numpy()[0]
+        # 存储所有连通域的信息
+        for i in np_crop_pred_results.shape[0]:
+            all_stats = []
+            for gray_value in range(1, 256):  # 避免背景0
+                # 创建二值图像，当前灰度值为前景
+                binary_image = np.where(np_crop_pred_results[i] == gray_value, 255, 0).astype(np.uint8)
+                # 连通域分析
+                num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(binary_image, connectivity=8)
+                # 忽略背景信息，记录该灰度值的连通域
+                for stat in stats[1:]:  # 跳过背景
+                    all_stats.append((gray_value, stat))
+            # 根据面积排序所有连通域
+            all_stats.sort(key=lambda x: x[1][cv2.CC_STAT_AREA], reverse=True)
+            for i, stat in enumerate(all_stats, 1):
+                left, top, width, height, area = stat
+                # 长和宽有任意一个大于3倍预测尺寸，就尺度归一化重新预测
+                if width > 3*512 or height > 3*512:
+                    # 提取区域并尺度归一化，并转换为tensor
+                    object_area = inputs[i][:, top:top+height, left:left+width]
+                    object_area = np.transpose(object_area, (1, 2, 0))
+                    object_area = cv2.resize(object_area, (512, 512), interpolation=cv2.INTER_LINEAR)
+                    object_area = np.transpose(object_area, (2, 0, 1))
+                    object_area = torch.tensor(object_area).unsqueeze(0)
+                    # inference
+                    batch_img_metas[0]['img_shape'] = object_area.shape[2:]
+                    # the output of encode_decode is seg logits tensor map
+                    # with shape [N, C, H, W]
+                    object_seg_logit = self.encode_decode(object_area, batch_img_metas)
+                    resized_tensor = F.interpolate(object_seg_logit.squeeze(0), size=(height, width), mode='bilinear', align_corners=True)
+                    ori_seg_logit = crop_pred_logits[i][:, top:top+height, left:left+width]
+                    crop_pred_logits[i][:, top:top+height, left:left+width] = 0.5*resized_tensor + 0.5*ori_seg_logit
+        return crop_pred_logits
+
     def slide_inference(self, inputs: Tensor,
                         batch_img_metas: List[dict]) -> Tensor:
         """Inference by sliding-window with overlap.
@@ -340,6 +393,8 @@ class EncoderDecoder(BaseSegmentor):
                 level=logging.WARN)
         if self.test_cfg.mode == 'slide':
             seg_logit = self.slide_inference(inputs, batch_img_metas)
+        elif self.test_cfg.mode == 'oc_slide':
+            seg_logit = self.oc_slide_inference(inputs, batch_img_metas)
         else:
             seg_logit = self.whole_inference(inputs, batch_img_metas)
 
