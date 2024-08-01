@@ -38,7 +38,7 @@ bash torchrun_train.sh /data9/gyl/RS_Code/mmsegmentation/configs/onlyfusion/segf
 # sam 
 bash torchrun_train.sh ../configs/samhqnet/segformer_gid.py 1 --work-dir /data9/gyl/RS_Code/mmseg_exp/samhq_gid
 bash torchrun_train.sh ../configs/samhqnet/segformer_urur.py 1 --work-dir /data9/gyl/RS_Code/mmseg_exp/samhq_urur
-bash torchrun_train.sh ../configs/samhqnet/segformer_fbp.py 1 --work-dir /data9/gyl/RS_Code/mmseg_exp/samhq_fbp
+bash torchrun_train.sh ../configs/samhqnet/segformer_fbp.py 1 --work-dir /data9/gyl/RS_Code/mmseg_exp/samhq1_fbp
 # only sam
 bash torchrun_train.sh ../configs/samhqnet/segformer_onlysam_gid.py 2 --work-dir /data1/gyl/RS_Code/mmseg_exp/onlysam_gid
 bash torchrun_train.sh ../configs/samhqnet/segformer_onlysam_fbp.py 2 --work-dir /data1/gyl/RS_Code/mmseg_exp/onlysam_fbp
