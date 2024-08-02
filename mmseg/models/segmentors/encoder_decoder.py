@@ -277,6 +277,7 @@ class EncoderDecoder(BaseSegmentor):
                 if width > 3*512 or height > 3*512:
                     # 提取区域并尺度归一化，并转换为tensor
                     object_area = inputs[i][:, top:top+height, left:left+width]
+                    object_area = object_area.detach().cpu().numpy()
                     object_area = np.transpose(object_area, (1, 2, 0))
                     object_area = cv2.resize(object_area, (512, 512), interpolation=cv2.INTER_LINEAR)
                     object_area = np.transpose(object_area, (2, 0, 1))
