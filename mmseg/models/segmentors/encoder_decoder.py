@@ -271,8 +271,8 @@ class EncoderDecoder(BaseSegmentor):
                     all_stats.append((gray_value, stat))
             # 根据面积排序所有连通域
             all_stats.sort(key=lambda x: x[1][cv2.CC_STAT_AREA], reverse=True)
-            for i, stat in enumerate(all_stats, 1):
-                left, top, width, height, area = stat
+            for i, stat in enumerate(all_stats):
+                left, top, width, height, area = stat[1]
                 # 长和宽有任意一个大于3倍预测尺寸，就尺度归一化重新预测
                 if width > 3*512 or height > 3*512:
                     # 提取区域并尺度归一化，并转换为tensor
