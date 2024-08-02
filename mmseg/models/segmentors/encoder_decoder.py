@@ -281,7 +281,7 @@ class EncoderDecoder(BaseSegmentor):
                     object_area = np.transpose(object_area, (1, 2, 0))
                     object_area = cv2.resize(object_area, (512, 512), interpolation=cv2.INTER_LINEAR)
                     object_area = np.transpose(object_area, (2, 0, 1))
-                    object_area = torch.tensor(object_area).unsqueeze(0)
+                    object_area = torch.FloatTensor(object_area).unsqueeze(0)
                     # inference
                     batch_img_metas[0]['img_shape'] = object_area.shape[2:]
                     # the output of encode_decode is seg logits tensor map
