@@ -259,7 +259,7 @@ class EncoderDecoder(BaseSegmentor):
         _, crop_pred_results = torch.max(crop_pred_logits, dim=1)
         np_crop_pred_results = crop_pred_results.detach().cpu().numpy()[0]
         # 存储所有连通域的信息
-        for i in np_crop_pred_results.shape[0]:
+        for i in range(np_crop_pred_results.shape[0]):
             all_stats = []
             for gray_value in range(1, 256):  # 避免背景0
                 # 创建二值图像，当前灰度值为前景
