@@ -2,7 +2,7 @@ _base_ = [
     '../_base_/models/fcn_unet_s5-d16.py', '../_base_/datasets/fbp_512x512.py',
     '../_base_/default_runtime.py', '../_base_/schedules/schedule_160k.py'
 ]
-crop_size = (512, 1024)
+crop_size = (512, 512)
 data_preprocessor = dict(size=crop_size)
 model = dict(
     data_preprocessor=data_preprocessor,
