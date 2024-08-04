@@ -10,7 +10,7 @@ model = dict(
     auxiliary_head=dict(num_classes=25),
     # model training and testing settings
     train_cfg=dict(),
-    test_cfg=dict(mode='slide', crop_size=(512, 1024), stride=(341, 341)))
+    test_cfg=dict(mode='slide', crop_size=(512, 512), stride=(341, 341)))
 train_dataloader = dict(batch_size=16, num_workers=10)
 val_dataloader = dict(batch_size=1, num_workers=4)
 test_dataloader = val_dataloader

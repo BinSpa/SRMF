@@ -2,7 +2,7 @@ _base_ = [
     '../_base_/models/fcn_unet_s5-d16.py', '../_base_/datasets/gid_512x512.py',
     '../_base_/default_runtime.py', '../_base_/schedules/schedule_160k.py'
 ]
-crop_size = (512, 1024)
+crop_size = (512, 512)
 data_preprocessor = dict(size=crop_size)
 model = dict(
     data_preprocessor=data_preprocessor,
@@ -10,7 +10,7 @@ model = dict(
     auxiliary_head=dict(num_classes=6),
     # model training and testing settings
     train_cfg=dict(),
-    test_cfg=dict(mode='slide', crop_size=(512, 1024),  stride=(341, 341)))
+    test_cfg=dict(mode='slide', crop_size=(512, 512),  stride=(341, 341)))
 train_dataloader = dict(batch_size=16, num_workers=10)
 val_dataloader = dict(batch_size=1, num_workers=4)
 test_dataloader = val_dataloader
