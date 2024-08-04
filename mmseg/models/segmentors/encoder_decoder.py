@@ -289,8 +289,8 @@ class EncoderDecoder(BaseSegmentor):
                     # the output of encode_decode is seg logits tensor map
                     # with shape [N, C, H, W]
                     object_seg_logit = self.encode_decode(object_area, batch_img_metas)
-                    assert False, "object_seg_logit shape:{}, object_area shape:{}".format(object_seg_logit.shape, object_area.shape)
-                    resized_tensor = F.interpolate(object_seg_logit.squeeze(0), size=(height, width), mode='bilinear', align_corners=True)
+                    # assert False, "object_seg_logit shape:{}, object_area shape:{}".format(object_seg_logit.shape, object_area.shape)
+                    resized_tensor = F.interpolate(object_seg_logit, size=(height, width), mode='bilinear', align_corners=True)
                     ori_seg_logit = crop_pred_logits[i][:, top:top+height, left:left+width]
                     crop_pred_logits[i][:, top:top+height, left:left+width] = 0.5*resized_tensor + 0.5*ori_seg_logit
         return crop_pred_logits
