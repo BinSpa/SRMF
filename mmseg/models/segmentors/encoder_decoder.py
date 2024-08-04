@@ -259,6 +259,7 @@ class EncoderDecoder(BaseSegmentor):
         _, crop_pred_results = torch.max(crop_pred_logits, dim=1)
         np_crop_pred_results = crop_pred_results.detach().cpu().numpy()[0]
         # 存储所有连通域的信息
+        device = inputs.device
         for i in range(np_crop_pred_results.shape[0]):
             all_stats = []
             for gray_value in range(1, 256):  # 避免背景0
@@ -282,6 +283,7 @@ class EncoderDecoder(BaseSegmentor):
                     object_area = cv2.resize(object_area, (512, 512), interpolation=cv2.INTER_LINEAR)
                     object_area = np.transpose(object_area, (2, 0, 1))
                     object_area = torch.FloatTensor(object_area).unsqueeze(0)
+                    object_area = object_area.to(device)
                     # inference
                     batch_img_metas[0]['img_shape'] = object_area.shape[2:]
                     # the output of encode_decode is seg logits tensor map
