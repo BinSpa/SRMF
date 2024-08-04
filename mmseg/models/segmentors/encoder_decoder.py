@@ -257,7 +257,7 @@ class EncoderDecoder(BaseSegmentor):
         crop_pred_logits = self.slide_inference(inputs, batch_img_metas)
         # crop_pred_results:(b,h,w)
         _, crop_pred_results = torch.max(crop_pred_logits, dim=1)
-        np_crop_pred_results = crop_pred_results.detach().cpu().numpy()[0]
+        np_crop_pred_results = crop_pred_results.detach().cpu().numpy()
         # 存储所有连通域的信息
         device = inputs.device
         for i in range(np_crop_pred_results.shape[0]):
