@@ -9,3 +9,5 @@ bash torchrun_test.sh ../configs/segformer/segformer_mit-b5_8xb2-160k_gid-512x51
 bash torchrun_test.sh ../configs/samhqnet/segformer_gid.py  /data1/gyl/RS_Code/mmseg_exp/samhq1_gid/iter_120000.pth 1 --work-dir ../../mmseg_exp/samhq1_gid
 bash torchrun_test.sh ../configs/samhqnet/segformer_urur.py  /data1/gyl/RS_Code/mmseg_exp/samhq1_urur/iter_160000.pth 1 --work-dir ../../mmseg_exp/samhq1_urur
 ## onlysam
+bash torchrun_test.sh ../configs/samhqnet/segformer_onlysam_gid.py /data1/gyl/RS_Code/mmseg_exp/onlysam_gid/iter_48000.pth 1 --work-dir ../../mmseg_exp/onlysam_gid
+bash torchrun_test.sh ../configs/samhqnet/segformer_onlysam_fbp.py /data1/gyl/RS_Code/mmseg_exp/onlysam_gid/iter_80000.pth 1 --work-dir ../../mmseg_exp/onlysam_fbp

@@ -28,7 +28,9 @@ model = dict(
         num_heads=[1, 2, 5, 8],
         num_layers=[3, 6, 40, 3]),
     decode_head=dict(type='MultiCrop_SegformerHead', in_channels=[64, 128, 320, 512], num_classes=6),
-    test_cfg = dict(mode='slide',crop_size=(512, 512),  stride=(341, 341)))
+    # test_cfg = dict(mode='slide',crop_size=(512, 512),  stride=(341, 341)))
+    test_cfg = dict(mode='oc_slide',crop_size=(512, 512),  stride=(341, 341)))
+
 
 optim_wrapper = dict(
     _delete_=True,
@@ -82,4 +84,11 @@ train_cfg = dict(
 default_hooks = dict(
     checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=8000),
     logger=dict(type='LoggerHook', interval=1000, log_metric_by_epoch=False),
+    # test visualizer
+    visualization=dict(type='SegVisualizationHook', draw=True, interval=1)
 )
+
+# test visualizer
+vis_backends = [dict(type='LocalVisBackend')]
+visualizer = dict(
+    type='SegLocalVisualizer', vis_backends=vis_backends, name='visualizer', alpha=1.0)
