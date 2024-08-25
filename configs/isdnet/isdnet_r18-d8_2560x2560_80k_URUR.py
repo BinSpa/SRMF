@@ -34,3 +34,10 @@ model = dict(
                 type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0)),
     ],
     auxiliary_head=dict(in_channels=256, channels=64, num_classes=8))
+
+# 训练设置
+train_cfg = dict(type='IterBasedTrainLoop', max_iters=80000, val_interval=50)
+default_hooks = dict(
+    logger=dict(type='LoggerHook', interval=50, log_metric_by_epoch=False),
+    checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=50),
+    visualization=dict(type='SegVisualizationHook'))
