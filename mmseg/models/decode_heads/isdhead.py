@@ -211,7 +211,7 @@ class ISDHead(BaseCascadeDecodeHead):
         self.sr_decoder = SRDecoder(self.conv_cfg, self.norm_cfg, self.act_cfg,
                                     channels=self.channels, up_lists=[4, 2, 2])
         # shallow branch
-        self.stdc_net = ShallowNet(in_channels=6, pretrain_model="STDCNet813M_73.91.tar")
+        self.stdc_net = ShallowNet(in_channels=6, pretrain_model="/data1/gyl/RS_Code/SOTAs/isdnet/STDCNet813M_73.91.tar")
         self.lap_prymaid_conv = Lap_Pyramid_Conv(num_high=2)
         self.conv_seg_aux_16 = SegmentationHead(self.conv_cfg, self.norm_cfg, self.act_cfg, self.channels,
                                                 self.channels // 2, self.num_classes, kernel_size=1)
