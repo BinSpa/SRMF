@@ -35,7 +35,7 @@ test_pipeline = [
 ]
 
 train_dataloader = dict(
-    batch_size=16,
+    batch_size=1,
     num_workers=10,
     persistent_workers=True,
     sampler=dict(type='InfiniteSampler', shuffle=True),

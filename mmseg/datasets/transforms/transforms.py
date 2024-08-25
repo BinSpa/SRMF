@@ -30,6 +30,8 @@ from num2words import num2words
 from IPython import embed
 import random
 
+from .compose import Compose
+
 try:
     import albumentations
     from albumentations import Compose
