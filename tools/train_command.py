@@ -47,3 +47,6 @@ bash torchrun_train.sh ../configs/samhqnet/segformer_onlysam_urur.py 2 --work-di
 bash torchrun_train.sh ../configs/unet/unet_s5-d16_fcn_4xb4-160k_gid.py 1 --work-dir /data1/gyl/RS_Code/mmseg_exp/unet_gid
 bash torchrun_train.sh ../configs/unet/unet_s5-d16_fcn_4xb4-160k_urur.py 1 --work-dir /data1/gyl/RS_Code/mmseg_exp/unet_urur
 bash torchrun_train.sh ../configs/unet/unet_s5-d16_fcn_4xb4-160k_fbp.py 1 --work-dir /data1/gyl/RS_Code/mmseg_exp/unet_fbp
+# isdnet
+bash torchrun_train.sh ../configs/isdnet/isdnet_r18-d8_2500x2500_80k_GID.py 1 --work-dir ../../mmseg_exp/isdnet_gid
+bash torchrun_train.sh ../configs/isdnet/isdnet_r18-d8_2560x2560_80k_URUR.py 1 --work-dir ../../mmseg_exp/isdnet_urur

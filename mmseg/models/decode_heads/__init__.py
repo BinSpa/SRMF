@@ -43,6 +43,9 @@ from .mctext_segformer_head import MCText_SegformerHead
 from .segformer_proto_head import Proto_SegformerHead
 from .shape_decode_head import ShapeDecodeHead
 from .segformer_shape_head import Shape_SegformerHead
+from .aspp_refine_head import RefineASPPHead
+from .refine_decode_head import RefineBaseDecodeHead
+from .isdhead import ISDHead
 
 __all__ = [
     'FCNHead', 'PSPHead', 'ASPPHead', 'PSAHead', 'NLHead', 'GCHead', 'CCHead',
@@ -55,5 +58,6 @@ __all__ = [
     'LightHamHead', 'PIDHead', 'DDRHead', 'VPDDepthHead', 'SideAdapterCLIPHead',
     'MultiCrop_SegformerHead', 'ImageProject_Head', 'UniDecodeHead', 
     'MCFusionSegformerHead', 'MCText_SegformerHead', 'Proto_SegformerHead',
-    'Shape_SegformerHead', 'ShapeDecodeHead'
+    'Shape_SegformerHead', 'ShapeDecodeHead', 'RefineASPPHead', 'RefineBaseDecodeHead',
+    'ISDHead'
 ]
