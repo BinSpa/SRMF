@@ -8,8 +8,10 @@ from .seg_tta import SegTTAModel
 from .mc_encoder_decoder import MCEncoderDecoder
 from .text_encoder_decoder import TextEncoderDecoder
 from .shape_encoder_decoder import ShapeEncoderDecoder
+from .encoder_decoder_refine import EncoderDecoderRefine
 __all__ = [
     'BaseSegmentor', 'EncoderDecoder', 'CascadeEncoderDecoder', 'SegTTAModel',
     'MultimodalEncoderDecoder', 'DepthEstimator', 
-    'MCEncoderDecoder', 'TextEncoderDecoder', 'ShapeEncoderDecoder'
+    'MCEncoderDecoder', 'TextEncoderDecoder', 'ShapeEncoderDecoder',
+    'EncoderDecoderRefine'
 ]
