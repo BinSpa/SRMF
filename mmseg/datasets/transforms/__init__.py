@@ -1,5 +1,5 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from .formatting import PackSegInputs, PackSegMultiInputs, PackSegShapeInputs
+from .formatting import PackSegInputs, PackSegMultiInputs, PackSegShapeInputs, Collect
 from .loading import (LoadAnnotations, LoadBiomedicalAnnotation,
                       LoadBiomedicalData, LoadBiomedicalImageFromFile,
                       LoadDepthAnnotation, LoadImageFromNDArray,
@@ -14,7 +14,7 @@ from .transforms import (CLAHE, AdjustGamma, Albu, BioMedical3DPad,
                          RandomRotate, RandomRotFlip, Rerange, Resize,
                          ResizeShortestEdge, ResizeToMultiple, RGB2Gray,
                          SegRescale, MultiLevelCrop, Image_Level_Text, 
-                         Samhq_boxes, ColorJittering, Shape_Detect)
+                         Samhq_boxes, ColorJittering, Shape_Detect, Pad, Normalize)
 
 # yapf: enable
 __all__ = [
@@ -28,5 +28,5 @@ __all__ = [
     'RandomRotFlip', 'Albu', 'LoadSingleRSImageFromFile', 'ConcatCDInput',
     'LoadMultipleRSImageFromFile', 'LoadDepthAnnotation', 'RandomDepthMix',
     'RandomFlip', 'Resize', 'MultiLevelCrop', 'Image_Level_Text', 'Samhq_boxes', 
-    'ColorJittering', 'Shape_Detect'
+    'ColorJittering', 'Shape_Detect', 'Pad', 'Normalize', 'Collect'
 ]

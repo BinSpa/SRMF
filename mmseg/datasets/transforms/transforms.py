@@ -3308,3 +3308,115 @@ class ColorJittering(BaseTransform):
 
         return results
 
+# idsnet add
+@TRANSFORMS.register_module()
+class Pad(object):
+    """Pad the image & mask.
+
+    There are two padding modes: (1) pad to a fixed size and (2) pad to the
+    minimum size that is divisible by some number.
+    Added keys are "pad_shape", "pad_fixed_size", "pad_size_divisor",
+
+    Args:
+        size (tuple, optional): Fixed padding size.
+        size_divisor (int, optional): The divisor of padded size.
+        pad_val (float, optional): Padding value. Default: 0.
+        seg_pad_val (float, optional): Padding value of segmentation map.
+            Default: 255.
+    """
+
+    def __init__(self,
+                 size=None,
+                 size_divisor=None,
+                 pad_val=0,
+                 seg_pad_val=255):
+        self.size = size
+        self.size_divisor = size_divisor
+        self.pad_val = pad_val
+        self.seg_pad_val = seg_pad_val
+        # only one of size and size_divisor should be valid
+        assert size is not None or size_divisor is not None
+        assert size is None or size_divisor is None
+
+    def _pad_img(self, results):
+        """Pad images according to ``self.size``."""
+        if self.size is not None:
+            padded_img = mmcv.impad(
+                results['img'], shape=self.size, pad_val=self.pad_val)
+        elif self.size_divisor is not None:
+            padded_img = mmcv.impad_to_multiple(
+                results['img'], self.size_divisor, pad_val=self.pad_val)
+        results['img'] = padded_img
+        results['pad_shape'] = padded_img.shape
+        results['pad_fixed_size'] = self.size
+        results['pad_size_divisor'] = self.size_divisor
+
+    def _pad_seg(self, results):
+        """Pad masks according to ``results['pad_shape']``."""
+        for key in results.get('seg_fields', []):
+            results[key] = mmcv.impad(
+                results[key],
+                shape=results['pad_shape'][:2],
+                pad_val=self.seg_pad_val)
+
+    def __call__(self, results):
+        """Call function to pad images, masks, semantic segmentation maps.
+
+        Args:
+            results (dict): Result dict from loading pipeline.
+
+        Returns:
+            dict: Updated result dict.
+        """
+
+        self._pad_img(results)
+        self._pad_seg(results)
+        return results
+
+    def __repr__(self):
+        repr_str = self.__class__.__name__
+        repr_str += f'(size={self.size}, size_divisor={self.size_divisor}, ' \
+                    f'pad_val={self.pad_val})'
+        return repr_str
+
+
+@TRANSFORMS.register_module()
+class Normalize(object):
+    """Normalize the image.
+
+    Added key is "img_norm_cfg".
+
+    Args:
+        mean (sequence): Mean values of 3 channels.
+        std (sequence): Std values of 3 channels.
+        to_rgb (bool): Whether to convert the image from BGR to RGB,
+            default is true.
+    """
+
+    def __init__(self, mean, std, to_rgb=True):
+        self.mean = np.array(mean, dtype=np.float32)
+        self.std = np.array(std, dtype=np.float32)
+        self.to_rgb = to_rgb
+
+    def __call__(self, results):
+        """Call function to normalize images.
+
+        Args:
+            results (dict): Result dict from loading pipeline.
+
+        Returns:
+            dict: Normalized results, 'img_norm_cfg' key is added into
+                result dict.
+        """
+
+        results['img'] = mmcv.imnormalize(results['img'], self.mean, self.std,
+                                          self.to_rgb)
+        results['img_norm_cfg'] = dict(
+            mean=self.mean, std=self.std, to_rgb=self.to_rgb)
+        return results
+
+    def __repr__(self):
+        repr_str = self.__class__.__name__
+        repr_str += f'(mean={self.mean}, std={self.std}, to_rgb=' \
+                    f'{self.to_rgb})'
+        return repr_str
