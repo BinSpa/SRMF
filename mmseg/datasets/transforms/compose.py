@@ -1,6 +1,7 @@
 import collections
 from mmseg.registry import TRANSFORMS
-from mmcv.utils import build_from_cfg
+# from mmcv.utils import build_from_cfg
+from mmengine import Registry, build_from_cfg
 
 @TRANSFORMS.register_module()
 class Compose(object):
