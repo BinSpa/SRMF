@@ -31,6 +31,47 @@ test_pipeline = [
             dict(type='Collect', keys=['img']),
         ])
 ]
+
+train_dataloader = dict(
+    batch_size=16,
+    num_workers=10,
+    persistent_workers=True,
+    sampler=dict(type='InfiniteSampler', shuffle=True),
+    dataset=dict(
+        type=dataset_type,
+        data_root=data_root,
+        data_prefix=dict(
+            img_path='train/image', seg_map_path='train/label'),
+        pipeline=train_pipeline))
+val_dataloader = dict(
+    batch_size=1,
+    num_workers=2,
+    persistent_workers=True,
+    sampler=dict(type='DefaultSampler', shuffle=False),
+    dataset=dict(
+        type=dataset_type,
+        data_root=data_root,
+        data_prefix=dict(
+            img_path='test/image', seg_map_path='test/label'),
+        pipeline=test_pipeline))
+
+test_dataloader = dict(
+    batch_size=1,
+    num_workers=2,
+    persistent_workers=True,
+    sampler=dict(type='DefaultSampler', shuffle=False),
+    dataset=dict(
+        type=dataset_type,
+        data_root=data_root,
+        data_prefix=dict(
+            img_path='test/image', seg_map_path='test/label'),
+        pipeline=test_pipeline))
+
+val_evaluator = dict(type='IoUMetric', iou_metrics=['mIoU'])
+test_evaluator = val_evaluator
+
+
+'''
 data = dict(
     samples_per_gpu=16,
     workers_per_gpu=10,
@@ -52,3 +93,4 @@ data = dict(
         img_dir='test/image',
         ann_dir='test/label',
         pipeline=test_pipeline))
+'''
