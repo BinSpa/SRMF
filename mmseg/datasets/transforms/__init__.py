@@ -14,7 +14,8 @@ from .transforms import (CLAHE, AdjustGamma, Albu, BioMedical3DPad,
                          RandomRotate, RandomRotFlip, Rerange, Resize,
                          ResizeShortestEdge, ResizeToMultiple, RGB2Gray,
                          SegRescale, MultiLevelCrop, Image_Level_Text, 
-                         Samhq_boxes, ColorJittering, Shape_Detect, Pad, Normalize)
+                         Samhq_boxes, ColorJittering, Shape_Detect, Pad, Normalize,
+                         MultiScaleFlipAug)
 
 # yapf: enable
 __all__ = [
@@ -28,5 +29,5 @@ __all__ = [
     'RandomRotFlip', 'Albu', 'LoadSingleRSImageFromFile', 'ConcatCDInput',
     'LoadMultipleRSImageFromFile', 'LoadDepthAnnotation', 'RandomDepthMix',
     'RandomFlip', 'Resize', 'MultiLevelCrop', 'Image_Level_Text', 'Samhq_boxes', 
-    'ColorJittering', 'Shape_Detect', 'Pad', 'Normalize', 'Collect'
+    'ColorJittering', 'Shape_Detect', 'Pad', 'Normalize', 'Collect', 'MultiScaleFlipAug'
 ]
