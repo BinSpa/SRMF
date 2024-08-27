@@ -54,4 +54,4 @@ default_hooks = dict(
 # test visualizer
 vis_backends = [dict(type='LocalVisBackend')]
 visualizer = dict(
-    type='SegLocalVisualizer', vis_backends=vis_backends, name='visualizer', save_dir='/home/rsr/gyl/RS_Code/mmseg_exp/segformerb5_gid', alpha=1.0)
+    type='SegLocalVisualizer', vis_backends=vis_backends, name='visualizer', alpha=1.0)

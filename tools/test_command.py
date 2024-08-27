@@ -11,3 +11,14 @@ bash torchrun_test.sh ../configs/samhqnet/segformer_urur.py  /data1/gyl/RS_Code/
 ## onlysam
 bash torchrun_test.sh ../configs/samhqnet/segformer_onlysam_gid.py /data1/gyl/RS_Code/mmseg_exp/onlysam_gid/iter_48000.pth 1 --work-dir ../../mmseg_exp/onlysam_gid
 bash torchrun_test.sh ../configs/samhqnet/segformer_onlysam_fbp.py /data1/gyl/RS_Code/mmseg_exp/onlysam_gid/iter_80000.pth 1 --work-dir ../../mmseg_exp/onlysam_fbp
+# swin-base 
+bash torchrun_test.sh ../configs/swin/swin-base-patch4-window7-gid-512x512.py /data1/gyl/RS_Code/mmseg_exp/swinbase_gid/iter_16000.pth 1 --work-dir ../../mmseg_visual/swinbase_gid
+bash torchrun_test.sh ../configs/swin/swin-base-patch4-window7-urur-512x512.py /data1/gyl/RS_Code/mmseg_exp/swinbase_urur/iter_32000.pth 1 --work-dir ../../mmseg_visual/swinbase_urur
+# unet
+bash torchrun_test.sh ../configs/
+# pspnet
+# deeplabv3+
+# segformer
+bash torchrun_test.sh ../configs/segformer/segformer_mit-b5_8xb2-160k_gid-512x512.py  1 --work-dir ../../mmseg_visual/segformer_gid
+bash torchrun_test.sh ../configs/segformer/segformer_mit-b5_8xb2-160k_urur-512x512.py  1 --work-dir ../../mmseg_visual/segformer_urur
+
