@@ -15,7 +15,8 @@ bash torchrun_test.sh ../configs/samhqnet/segformer_onlysam_fbp.py /data1/gyl/RS
 bash torchrun_test.sh ../configs/swin/swin-base-patch4-window7-gid-512x512.py /data1/gyl/RS_Code/mmseg_exp/swinbase_gid/iter_16000.pth 1 --work-dir ../../mmseg_visual/swinbase_gid
 bash torchrun_test.sh ../configs/swin/swin-base-patch4-window7-urur-512x512.py /data1/gyl/RS_Code/mmseg_exp/swinbase_urur/iter_32000.pth 1 --work-dir ../../mmseg_visual/swinbase_urur
 # unet
-bash torchrun_test.sh ../configs/
+bash torchrun_test.sh ../configs/unet/unet_s5-d16_fcn_4xb4-160k_gid.py /data1/gyl/RS_Code/mmseg_exp/unet_gid/iter_152000.pth 1 --work_dir ../../mmseg_visual/unet_gid
+bash torchrun_test.sh ../configs/unet/unet_s5-d16_fcn_4xb4-160k_urur.py /data1/gyl/RS_Code/mmseg_exp/unet_urur/iter_128000.pth 1 --work_dir ../../mmseg_visual/unet_urur
 # pspnet
 # deeplabv3+
 # segformer
