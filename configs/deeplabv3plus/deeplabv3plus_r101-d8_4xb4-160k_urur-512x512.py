@@ -15,12 +15,20 @@ model = dict(
     test_cfg = dict(mode='slide',crop_size=(512, 512),  stride=(341, 341)))
 
 train_dataloader = dict(batch_size=8, num_workers=10)
-test_dataloader = dict(batch_size=2, num_workers=4)
+test_dataloader = dict(batch_size=1, num_workers=4)
 val_dataloader = test_dataloader
 
 train_cfg = dict(
-    type='IterBasedTrainLoop', max_iters=160000, val_interval=2000)
+    type='IterBasedTrainLoop', max_iters=160000, val_interval=2000),
 
 default_hooks = dict(
     checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=4000),
+    logger=dict(type='LoggerHook', interval=1000, log_metric_by_epoch=False),
+    # test visualizer
+    visualization=dict(type='SegVisualizationHook', draw=True, interval=1)
 )
+
+# test visualizer
+vis_backends = [dict(type='LocalVisBackend')]
+visualizer = dict(
+    type='SegLocalVisualizer', vis_backends=vis_backends, name='visualizer', alpha=1.0)
