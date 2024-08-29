@@ -24,6 +24,5 @@ bash torchrun_test.sh ../configs/pspnet/pspnet_r101-d8_4xb4-80k_urur-512x512.py 
 bash torchrun_test.sh ../configs/deeplabv3plus/deeplabv3plus_r101-d8_4xb4-160k_gid-512x512.py ../../mmseg_visual/deeplabv3p_gid/iter_160000.pth 1 --work-dir ../../mmseg_visual/deeplabv3p_gid
 bash torchrun_test.sh ../configs/deeplabv3plus/deeplabv3plus_r101-d8_4xb4-160k_urur-512x512.py ../../mmseg_visual/deeplabv3p_urur/iter_12000.pth 1 --work-dir ../../mmseg_visual/deeplabv3p_urur
 # segformer
-bash torchrun_test.sh ../configs/segformer/segformer_mit-b5_8xb2-160k_gid-512x512.py  1 --work-dir ../../mmseg_visual/segformer_gid
-bash torchrun_test.sh ../configs/segformer/segformer_mit-b5_8xb2-160k_urur-512x512.py  1 --work-dir ../../mmseg_visual/segformer_urur
-
+bash torchrun_test.sh ../configs/segformer/segformer_mit-b5_8xb2-160k_gid-512x512.py ../../mmseg_visual/segformer_gid/iter_128000.pth 1 --work-dir ../../mmseg_visual/segformer_gid
+bash torchrun_test.sh ../configs/segformer/segformer_mit-b5_8xb2-160k_urur-512x512.py ../../mmseg_visual/segformer_urur/iter_28000.pth 1 --work-dir ../../mmseg_visual/segformer_urur
