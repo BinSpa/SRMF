@@ -26,3 +26,6 @@ bash torchrun_test.sh ../configs/deeplabv3plus/deeplabv3plus_r101-d8_4xb4-160k_u
 # segformer
 bash torchrun_test.sh ../configs/segformer/segformer_mit-b5_8xb2-160k_gid-512x512.py ../../mmseg_visual/segformer_gid/iter_128000.pth 1 --work-dir ../../mmseg_visual/segformer_gid
 bash torchrun_test.sh ../configs/segformer/segformer_mit-b5_8xb2-160k_urur-512x512.py ../../mmseg_visual/segformer_urur/iter_28000.pth 1 --work-dir ../../mmseg_visual/segformer_urur
+# sam_keepgsd
+bash torchrun_test.sh ../configs/samhqnet/segformer_gid.py ../../mmseg_exp/samhq_gid/iter_96000.pth 1 --work-dir ../../mmseg_visual/keepgsd_gid
+bash torchrun_test.sh ../configs/samhqnet/segformer_urur.py ../../mmseg_exp/samhq_urur/iter_104000.pth 1 --work-dir ../../mmseg_visual/keepgsd_urur
