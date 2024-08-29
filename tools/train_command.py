@@ -8,6 +8,10 @@ bash torchrun_train.sh /mnt/data/nas/gyl/RS_Code/mmsegmentation/configs/segforme
 bash torchrun_train.sh /mnt/data/nas/gyl/RS_Code/mmsegmentation/configs/segformer/segformer_mit-b5_8xb2-160k_urur-512x512.py 1 --work-dir /mnt/data/nas/gyl/RS_Code/mmseg_exp/segformer_urur
 bash torchrun_train.sh /mnt/data/nas/gyl/RS_Code/mmsegmentation/configs/deeplabv3plus/deeplabv3plus_r101-d8_4xb4-160k_urur-512x512.py 1 --work-dir /mnt/data/nas/gyl/RS_Code/mmseg_exp/deeplab_urur
 bash torchrun_train.sh ../configs/deeplabv3plus/deeplabv3plus_r101-d8_4xb4-160k_fbp-512x512.py 2 --work-dir ../../mmseg_exp/deeplabv3p_fbp
+bash torchrun_train.sh ../configs/deeplabv3plus/deeplabv3plus_r101-d8_4xb4-160k_gid-512x512.py 1 --work-dir ../../mmseg_exp/deeplabv3p_gid
+bash torchrun_train.sh ../configs/deeplabv3plus/deeplabv3plus_r101-d8_4xb4-160k_urur-512x512.py 1 --work-dir ../../mmseg_exp/deeplabv3p_urur
+# pspnet
+bash torchrun_train.sh ../configs/pspnet/pspnet_r101-d8_4xb4-80k_gid-512x512.py 1 --work-dir ../../mmseg_exp/pspnet_gid
 # swin-base
 bash torchrun_train.sh ../configs/swin/swin-base-patch4-window7-fbp-512x512.py 2 --work-dir ../../mmseg_exp/swinbase_fbp
 bash torchrun_train.sh ../configs/swin/swin-base-patch4-window7-urur-512x512.py 2 --work-dir ../../mmseg_exp/swinbase_urur

@@ -14,7 +14,7 @@ model = dict(
     backbone=dict(depth=101),
     test_cfg = dict(mode='slide',crop_size=(512, 512),  stride=(341, 341)))
 
-train_dataloader = dict(batch_size=8, num_workers=10)
+train_dataloader = dict(batch_size=16, num_workers=12)
 test_dataloader = dict(batch_size=1, num_workers=4)
 val_dataloader = test_dataloader
 
@@ -25,10 +25,10 @@ default_hooks = dict(
     checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=4000),
     logger=dict(type='LoggerHook', interval=1000, log_metric_by_epoch=False),
     # test visualizer
-    visualization=dict(type='SegVisualizationHook', draw=True, interval=1)
+    # visualization=dict(type='SegVisualizationHook', draw=True, interval=1)
 )
 
 # test visualizer
-vis_backends = [dict(type='LocalVisBackend')]
-visualizer = dict(
-    type='SegLocalVisualizer', vis_backends=vis_backends, name='visualizer', alpha=1.0)
+# vis_backends = [dict(type='LocalVisBackend')]
+# visualizer = dict(
+#     type='SegLocalVisualizer', vis_backends=vis_backends, name='visualizer', alpha=1.0)
