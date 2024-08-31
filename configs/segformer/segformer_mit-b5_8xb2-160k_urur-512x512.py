@@ -40,12 +40,20 @@ param_scheduler = [
     )
 ]
 train_dataloader = dict(batch_size=4, num_workers=4)
-val_dataloader = dict(batch_size=4, num_workers=4)
+val_dataloader = dict(batch_size=1, num_workers=4)
 test_dataloader = val_dataloader
 
 train_cfg = dict(
     type='IterBasedTrainLoop', max_iters=160000, val_interval=2000)
 
+vis_backends = [dict(type='LocalVisBackend')]
+visualizer = dict(
+    # test
+    type='SegLocalVisualizer', vis_backends=vis_backends, name='visualizer', alpha=1.0)
+# test
 default_hooks = dict(
-    checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=4000),
+    logger=dict(type='LoggerHook', interval=1000, log_metric_by_epoch=False),
+    checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=8000),
+    visualization=dict(type='SegVisualizationHook', draw=True, interval=1)
 )
+
