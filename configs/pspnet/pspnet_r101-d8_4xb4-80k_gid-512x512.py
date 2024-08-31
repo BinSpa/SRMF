@@ -19,8 +19,7 @@ test_dataloader = val_dataloader
 vis_backends = [dict(type='LocalVisBackend')]
 visualizer = dict(
     # test
-    type='SegLocalVisualizer', vis_backends=vis_backends, name='visualizer', alpha=1.0
-)
+    type='SegLocalVisualizer', vis_backends=vis_backends, name='visualizer', alpha=1.0)
 # test
 default_hooks = dict(
     logger=dict(type='LoggerHook', interval=1000, log_metric_by_epoch=False),

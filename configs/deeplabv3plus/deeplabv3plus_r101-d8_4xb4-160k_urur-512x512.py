@@ -21,14 +21,14 @@ val_dataloader = test_dataloader
 train_cfg = dict(
     type='IterBasedTrainLoop', max_iters=160000, val_interval=16000)
 
+# test visualizer
+vis_backends = [dict(type='LocalVisBackend')]
+visualizer = dict(
+    type='SegLocalVisualizer', vis_backends=vis_backends, name='visualizer', alpha=1.0)
+
 default_hooks = dict(
     checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=16000),
     logger=dict(type='LoggerHook', interval=1000, log_metric_by_epoch=False),
     # test visualizer
-    # visualization=dict(type='SegVisualizationHook', draw=True, interval=1)
+    visualization=dict(type='SegVisualizationHook', draw=True, interval=1)
 )
-
-# test visualizer
-# vis_backends = [dict(type='LocalVisBackend')]
-# visualizer = dict(
-#     type='SegLocalVisualizer', vis_backends=vis_backends, name='visualizer', alpha=1.0)
