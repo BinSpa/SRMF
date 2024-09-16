@@ -12,6 +12,7 @@ bash torchrun_train.sh ../configs/deeplabv3plus/deeplabv3plus_r101-d8_4xb4-160k_
 bash torchrun_train.sh ../configs/deeplabv3plus/deeplabv3plus_r101-d8_4xb4-160k_urur-512x512.py 2 --work-dir ../../mmseg_exp/deeplabv3p_urur
 # pspnet
 bash torchrun_train.sh ../configs/pspnet/pspnet_r101-d8_4xb4-80k_gid-512x512.py 1 --work-dir ../../mmseg_exp/pspnet_gid
+bash torchrun_train.sh ../configs/pspnet/pspnet_r101-d8_4xb4-80k_fbp-512x512.py 1 --work-dir ../../mmseg_exp/pspnet_fbp
 # swin-base
 bash torchrun_train.sh ../configs/swin/swin-base-patch4-window7-fbp-512x512.py 2 --work-dir ../../mmseg_exp/swinbase_fbp
 bash torchrun_train.sh ../configs/swin/swin-base-patch4-window7-urur-512x512.py 2 --work-dir ../../mmseg_exp/swinbase_urur
@@ -47,8 +48,10 @@ bash torchrun_train.sh ../configs/samhqnet/segformer_fbp.py 1 --work-dir /data1/
 bash torchrun_train.sh ../configs/samhqnet/segformer_onlysam_gid.py 2 --work-dir /data1/gyl/RS_Code/mmseg_exp/onlysam_gid
 bash torchrun_train.sh ../configs/samhqnet/segformer_onlysam_fbp.py 2 --work-dir /data1/gyl/RS_Code/mmseg_exp/onlysam_fbp
 bash torchrun_train.sh ../configs/samhqnet/segformer_onlysam_urur.py 2 --work-dir /data1/gyl/RS_Code/mmseg_exp/onlysam_urur
-# mc sam keepgsd
+# mc sam allgsd
 bash torchrun_train.sh ../configs/samhqnet/segformer_allgsd_fbp.py 1 --work-dir /data1/gyl/RS_Code/mmseg_exp/samhq_allgsd_fbp
+# mc sam nogsd
+bash torchrun_train.sh ../configs/samhqnet/segformer_bogsd_fbp.py 1 --work-dir /data1/gyl/RS_Code/mmseg_exp/samhq_nogsd_fbp
 # unet 
 bash torchrun_train.sh ../configs/unet/unet_s5-d16_fcn_4xb4-160k_gid.py 1 --work-dir /data1/gyl/RS_Code/mmseg_exp/unet_gid
 bash torchrun_train.sh ../configs/unet/unet_s5-d16_fcn_4xb4-160k_urur.py 1 --work-dir /data1/gyl/RS_Code/mmseg_exp/unet_urur
