@@ -63,7 +63,7 @@ train_pipeline = [
     dict(type='Samhq_boxes', boxes_path=boxes_path, select_num=4, keep_gsd=True, ifmc=True),
     # dict(type='RandomCrop', crop_size=crop_size, cat_max_ratio=0.75),
     dict(type='RandomFlip', prob=0.8, direction=['horizontal', 'vertical']),
-    # dict(type='MultiLevelCrop', crop_size=crop_size, cat_max_ratio=0.75, level_list=[1,2,3,4], withlocal=False),
+    dict(type='MultiLevelCrop', crop_size=crop_size, cat_max_ratio=0.75, level_list=[1,2,3,4], withlocal=False),
     dict(type='PackSegMultiInputs')
 ]
 
@@ -85,10 +85,10 @@ default_hooks = dict(
     checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=8000),
     logger=dict(type='LoggerHook', interval=1000, log_metric_by_epoch=False),
     # test visualizer
-    visualization=dict(type='SegVisualizationHook', draw=True, interval=1)
+    # visualization=dict(type='SegVisualizationHook', draw=True, interval=1)
 )
 
 # test visualizer
-vis_backends = [dict(type='LocalVisBackend')]
-visualizer = dict(
-    type='SegLocalVisualizer', vis_backends=vis_backends, name='visualizer', alpha=1.0)
+# vis_backends = [dict(type='LocalVisBackend')]
+# visualizer = dict(
+    # type='SegLocalVisualizer', vis_backends=vis_backends, name='visualizer', alpha=1.0)
