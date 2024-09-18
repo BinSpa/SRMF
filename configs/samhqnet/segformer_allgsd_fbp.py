@@ -60,10 +60,10 @@ param_scheduler = [
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations'),
-    dict(type='Samhq_boxes', boxes_path=boxes_path, select_num=4, keep_gsd=True, ifmc=True),
+    dict(type='Samhq_boxes', boxes_path=boxes_path, select_num=8, keep_gsd=True, ifmc=False, sample=True),
     # dict(type='RandomCrop', crop_size=crop_size, cat_max_ratio=0.75),
     dict(type='RandomFlip', prob=0.8, direction=['horizontal', 'vertical']),
-    dict(type='MultiLevelCrop', crop_size=crop_size, cat_max_ratio=0.75, level_list=[1,2,3,4], withlocal=False),
+    # dict(type='MultiLevelCrop', crop_size=crop_size, cat_max_ratio=0.75, level_list=[1,2,3,4], withlocal=False),
     dict(type='PackSegMultiInputs')
 ]
 

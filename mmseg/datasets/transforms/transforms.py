@@ -311,6 +311,7 @@ class Samhq_boxes(BaseTransform):
             if self.sample == False:
                 select_boxes = boxes[:self.select_num]
             else:
+                arr = np.arange(len(boxes))
                 select_indexs = self.weighted_random_sampling(arr, self.select_num)  
                 select_boxes = [boxes[index] for index in select_indexs]      
         elif self.ifmc == False:

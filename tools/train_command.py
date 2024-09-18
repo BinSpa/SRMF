@@ -40,7 +40,7 @@ bash torchrun_train.sh /home/rsr/gyl/RS_Code/mmsegmentation/configs/mcfusionnet/
 # onlyfusion
 bash torchrun_train.sh /data9/gyl/RS_Code/mmsegmentation/configs/onlyfusion/segformer_mit-b5_8xb2-160k_gid-512x512_onlyfusion.py 1 --work-dir /data9/gyl/RS_Code/mmseg_exp/segformer_gid_onlyfusion
 bash torchrun_train.sh /data9/gyl/RS_Code/mmsegmentation/configs/onlyfusion/segformer_mit-b5_8xb2-160k_urur-512x512_onlyfusion.py 1 --work-dir /data9/gyl/RS_Code/mmseg_exp/segformer_urur_onlyfusion
-# sam 
+# sam keepgsd
 bash torchrun_train.sh ../configs/samhqnet/segformer_gid.py 1 --work-dir /data1/gyl/RS_Code/mmseg_exp/samhq_gid
 bash torchrun_train.sh ../configs/samhqnet/segformer_urur.py 1 --work-dir /data1/gyl/RS_Code/mmseg_exp/samhq_urur
 bash torchrun_train.sh ../configs/samhqnet/segformer_fbp.py 1 --work-dir /data1/gyl/RS_Code/mmseg_exp/keepgsd12_fbp
