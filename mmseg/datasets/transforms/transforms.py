@@ -271,7 +271,8 @@ class Samhq_boxes(BaseTransform):
                  img_size: tuple = (512,512),
                  scale_ratio: float = 1.2,
                  ifmc: bool = True,
-                 keep_gsd: bool = False) -> None:
+                 keep_gsd: bool = False,
+                 sample: bool = False) -> None:
         super().__init__()
         self.boxes_path = boxes_path
         self.select_num = select_num
@@ -279,6 +280,7 @@ class Samhq_boxes(BaseTransform):
         self.scale_ratio = scale_ratio
         self.keep_gsd = keep_gsd
         self.ifmc = ifmc
+        self.sample = sample
     
     def enlarge_box(self, x, y, w, h):
         """
@@ -306,7 +308,11 @@ class Samhq_boxes(BaseTransform):
         cropped_gts = []
         ori_h, ori_w, _ = ori_img.shape
         if self.ifmc == True:
-            select_boxes = boxes[:self.select_num]
+            if self.sample == False:
+                select_boxes = boxes[:self.select_num]
+            else:
+                select_indexs = self.weighted_random_sampling(arr, self.select_num)  
+                select_boxes = [boxes[index] for index in select_indexs]      
         elif self.ifmc == False:
             arr = np.arange(len(boxes))
             select_indexs = self.weighted_random_sampling(arr, self.select_num)
@@ -343,6 +349,7 @@ class Samhq_boxes(BaseTransform):
                 cropped_gts.append(resized_gt)
                 cropped_gts.append(keepgsd_gt)
             else:
+                '''
                 # 临时实验：keepgsd=False
                 resized_img = cv2.resize(cropped_img, (self.img_size[0], self.img_size[1]), interpolation=cv2.INTER_LINEAR)
                 resized_gt = cv2.resize(cropped_gt, (self.img_size[0], self.img_size[1]), interpolation=cv2.INTER_NEAREST)
@@ -366,7 +373,7 @@ class Samhq_boxes(BaseTransform):
                 resized_gt = ori_gt[start_y:end_y, start_x:end_x]
                 cropped_imgs.append(resized_img)
                 cropped_gts.append(resized_gt)
-                '''
+                
         for i, cropped_img in enumerate(cropped_imgs):
             if cropped_img.shape[0] != 512 or cropped_img.shape[1] != 512:
                 assert False, "wrong image shape:{}, index:{}, samshape:{},{}, newshape:{},{}".format(cropped_img.shape, i, h, w, new_x, new_y)

@@ -58,7 +58,7 @@ train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations'),
     # dict(type='ColorJittering'),
-    dict(type='Samhq_boxes', boxes_path=boxes_path, select_num=4, keep_gsd=True, ifmc=True),
+    dict(type='Samhq_boxes', boxes_path=boxes_path, select_num=12, keep_gsd=True, ifmc=True),
     # dict(type='RandomCrop', crop_size=crop_size, cat_max_ratio=0.75),
     dict(type='RandomFlip', prob=0.8, direction=['horizontal', 'vertical']),
     dict(type='MultiLevelCrop', crop_size=crop_size, cat_max_ratio=0.75, level_list=[1,2,3,4], withlocal=False),
@@ -72,7 +72,7 @@ test_pipeline = [
     dict(type='PackSegInputs')
 ]
 
-train_dataloader = dict(batch_size=2, num_workers=16, dataset=dict(pipeline=train_pipeline))
+train_dataloader = dict(batch_size=1, num_workers=16, dataset=dict(pipeline=train_pipeline))
 val_dataloader = dict(batch_size=1, num_workers=4, dataset=dict(pipeline=test_pipeline))
 test_dataloader = val_dataloader
 
