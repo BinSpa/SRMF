@@ -60,7 +60,7 @@ param_scheduler = [
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations'),
-    dict(type='Samhq_boxes', boxes_path=boxes_path, select_num=4, keep_gsd=True, ifmc=True),
+    dict(type='Samhq_boxes', boxes_path=boxes_path, select_num=12, keep_gsd=True, ifmc=True),
     # dict(type='RandomCrop', crop_size=crop_size, cat_max_ratio=0.75),
     dict(type='RandomFlip', prob=0.8, direction=['horizontal', 'vertical']),
     dict(type='MultiLevelCrop', crop_size=crop_size, cat_max_ratio=0.75, level_list=[1,2,3,4], withlocal=False),
@@ -74,15 +74,15 @@ test_pipeline = [
     dict(type='PackSegInputs')
 ]
 
-train_dataloader = dict(batch_size=2, num_workers=12, dataset=dict(pipeline=train_pipeline))
+train_dataloader = dict(batch_size=1, num_workers=12, dataset=dict(pipeline=train_pipeline))
 val_dataloader = dict(batch_size=1, num_workers=4, dataset=dict(pipeline=test_pipeline))
 test_dataloader = val_dataloader
 
 train_cfg = dict(
-    type='IterBasedTrainLoop', max_iters=160000, val_interval=8000)
+    type='IterBasedTrainLoop', max_iters=160000, val_interval=16000)
 
 default_hooks = dict(
-    checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=8000),
+    checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=16000),
     logger=dict(type='LoggerHook', interval=1000, log_metric_by_epoch=False),
     # test visualizer
     # visualization=dict(type='SegVisualizationHook', draw=True, interval=1)
