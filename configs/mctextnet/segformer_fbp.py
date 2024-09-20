@@ -9,7 +9,7 @@ boxes_path = '/data1/gyl/RS_DATASET/boxes_jsonl/fbp_boxes.jsonl'
 
 crop_size = (512, 512)
 
-clip_text = "/mnt/data/nas/gyl/RS_Code/mmseg_exp/Code/clip_vith14_txtfeat.pt"
+clip_text = "/data1/gyl/RS_Code/mmseg_exp/Code/clip_vith14_txtfeat.pt"
 data_preprocessor = dict(
     type='MultiSegDataPreProcessor',
     mean=[123.675, 116.28, 103.53],
@@ -77,7 +77,7 @@ test_pipeline = [
 ]
 
 train_dataloader = dict(batch_size=1, num_workers=16, dataset=dict(pipeline=train_pipeline))
-val_dataloader = dict(batch_size=4, num_workers=4, dataset=dict(pipeline=test_pipeline))
+val_dataloader = dict(batch_size=2, num_workers=4, dataset=dict(pipeline=test_pipeline))
 test_dataloader = val_dataloader
 
 train_cfg = dict(
