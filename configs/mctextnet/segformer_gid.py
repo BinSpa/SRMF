@@ -4,12 +4,13 @@ _base_ = [
 ]
 
 
-record_path = '/data1/gyl/RS_DATASET/boxes_jsonl/gid_record.jsonl'
+# record_path = '/data1/gyl/RS_DATASET/boxes_jsonl/gid_record.jsonl'
 boxes_path = '/data1/gyl/RS_DATASET/boxes_jsonl/gid_boxes.jsonl'
 
 crop_size = (512, 512)
 
-clip_text = "/data1/gyl/RS_Code/mmseg_exp/Code/clip_vith14_txtfeat.pt"
+# clip_text = "/data1/gyl/RS_Code/mmseg_exp/Code/clip_vith14_txtfeat.pt"
+clip_text = "/data1/gyl/RS_Code/mmseg_exp/Code/cliph14_img54.pt"
 data_preprocessor = dict(
     type='MultiSegDataPreProcessor',
     mean=[123.675, 116.28, 103.53],
@@ -62,7 +63,7 @@ train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations'),
     # dict(type='ColorJittering'),
-    dict(type='Samhq_boxes', boxes_path=boxes_path, record_path=record_path, select_num=4, keep_gsd=True, ifmc=True),
+    dict(type='Samhq_boxes', boxes_path=boxes_path, select_num=4, keep_gsd=True, ifmc=True),
     # dict(type='RandomCrop', crop_size=crop_size, cat_max_ratio=0.75),
     dict(type='RandomFlip', prob=0.8, direction=['horizontal', 'vertical']),
     dict(type='MultiLevelCrop', crop_size=crop_size, cat_max_ratio=0.75, level_list=[1,2,3,4], withlocal=False),

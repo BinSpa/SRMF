@@ -350,6 +350,7 @@ class Samhq_boxes(BaseTransform):
                 cropped_gts.append(resized_gt)
                 cropped_gts.append(keepgsd_gt)
             else:
+                '''
                 # 临时实验：keepgsd=False
                 resized_img = cv2.resize(cropped_img, (self.img_size[0], self.img_size[1]), interpolation=cv2.INTER_LINEAR)
                 resized_gt = cv2.resize(cropped_gt, (self.img_size[0], self.img_size[1]), interpolation=cv2.INTER_NEAREST)
@@ -373,7 +374,6 @@ class Samhq_boxes(BaseTransform):
                 resized_gt = ori_gt[start_y:end_y, start_x:end_x]
                 cropped_imgs.append(resized_img)
                 cropped_gts.append(resized_gt)
-                '''
                 
         for i, cropped_img in enumerate(cropped_imgs):
             if cropped_img.shape[0] != 512 or cropped_img.shape[1] != 512:
