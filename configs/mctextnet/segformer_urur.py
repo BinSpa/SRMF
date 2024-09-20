@@ -85,11 +85,12 @@ train_cfg = dict(
 default_hooks = dict(
     checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=8000),
     logger=dict(type='LoggerHook', interval=1000, log_metric_by_epoch=False),
-    visualization=dict(type='SegVisualizationHook', interval=1)
+    # test
+    # visualization=dict(type='SegVisualizationHook', interval=1)
 )
-
-vis_backends = [dict(type='LocalVisBackend')]
-visualizer = dict(
-    type='SegLocalVisualizer', vis_backends=vis_backends, name='visualizer', alpha=1.0)
+# test
+# vis_backends = [dict(type='LocalVisBackend')]
+# visualizer = dict(
+#     type='SegLocalVisualizer', vis_backends=vis_backends, name='visualizer', alpha=1.0)
 
 
