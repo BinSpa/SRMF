@@ -82,7 +82,7 @@ val_dataloader = dict(batch_size=4, num_workers=4, dataset=dict(pipeline=test_pi
 test_dataloader = val_dataloader
 
 train_cfg = dict(
-    type='IterBasedTrainLoop', max_iters=160000, val_interval=200)
+    type='IterBasedTrainLoop', max_iters=160000, val_interval=8000)
 
 default_hooks = dict(
     checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=8000),
