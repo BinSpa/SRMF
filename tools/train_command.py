@@ -29,9 +29,9 @@ bash torchrun_train.sh ../configs/mctextnet/segformer_gid_txt.py 1 --work-dir ..
 bash torchrun_train.sh ../configs/mctextnet/segformer_urur_txt.py 1 --work-dir ../../mmseg_exp/mctxt_urur
 bash torchrun_train.sh ../configs/mctextnet/segformer_fbp_txt.py 1 --work-dir ../../mmseg_exp/mctxt_fbp --amp
 # mcimg exp
-bash torchrun_train.sh ../configs/mctextnet/segformer_gid_img.py 1 --work-dir ../../mmseg_exp/mcimg_gid
+bash torchrun_train.sh ../configs/mctextnet/segformer_gid_img.py 2 --work-dir ../../mmseg_exp/mcimg_gid
 bash torchrun_train.sh ../configs/mctextnet/segformer_urur_img.py 2 --work-dir ../../mmseg_exp/mcimg_urur
-bash torchrun_train.sh ../configs/mctextnet/segformer_fbp_img.py 2 --work-dir ../../mmseg_exp/mcimg_fbp --amp
+bash torchrun_train.sh ../configs/mctextnet/segformer_fbp_img.py 1 --work-dir ../../mmseg_exp/mcimg_fbp --amp
 # proto exp
 bash torchrun_train.sh ../configs/mctextnet/segformer-b2_gid_proto.py 1 --work-dir ../../mmseg_exp/proto_gid
 bash torchrun_train.sh ../configs/mctextnet/segformer-b2_urur_proto.py 1 --work-dir ../../mmseg_exp/proto_urur
