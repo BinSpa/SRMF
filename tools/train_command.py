@@ -25,11 +25,11 @@ bash torchrun_train.sh ../configs/multicropnet/segformer-b5_fbp.py 2 --work-dir 
 bash torchrun_train.sh ../configs/multicropnet/segformer_mit-b5_8xb2-160k_gid-512x512-ce.py 1 --work-dir /data9/gyl/RS_Code/mmseg_exp/mcgid_color
 bash torchrun_train.sh ../configs/multicropnet/segformer_mit-b5_8xb2-160k_urur-512x512-ce.py 1 --work-dir /data9/gyl/RS_Code/mmseg_exp/mcurur_color
 # mctext exp
-bash torchrun_train.sh ../configs/mctextnet/segformer_gid.py 2 --work-dir ../../mmseg_exp/mctxt_gid
-bash torchrun_train.sh ../configs/mctextnet/segformer_urur.py 2 --work-dir ../../mmseg_exp/mctxt_urur
+bash torchrun_train.sh ../configs/mctextnet/segformer_gid.py 1 --work-dir ../../mmseg_exp/mctxt_gid_test
+bash torchrun_train.sh ../configs/mctextnet/segformer_urur.py 1 --work-dir ../../mmseg_exp/mctxt_urur
 bash torchrun_train.sh ../configs/mctextnet/segformer_fbp.py 1 --work-dir ../../mmseg_exp/mctxt_fbp --amp
 # mcimg exp
-bash torchrun_train.sh ../configs/mctextnet/segformer_gid.py 2 --work-dir ../../mmseg_exp/mcimg_gid
+bash torchrun_train.sh ../configs/mctextnet/segformer_gid.py 1 --work-dir ../../mmseg_exp/mcimg_gid
 bash torchrun_train.sh ../configs/mctextnet/segformer_urur.py 2 --work-dir ../../mmseg_exp/mcimg_urur
 bash torchrun_train.sh ../configs/mctextnet/segformer_fbp.py 2 --work-dir ../../mmseg_exp/mcimg_fbp --amp
 # proto exp
