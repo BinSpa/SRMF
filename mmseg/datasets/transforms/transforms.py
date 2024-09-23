@@ -636,11 +636,12 @@ class MultiLevelCrop(BaseTransform):
                     continue
                 if labels[max_index] == 0:
                     # if background is larger than 50%
-                    if np.max(cnt) / np.sum(cnt) > 0.5:
+                    if np.max(cnt) / np.sum(cnt) > 0.4:
                         crop_bbox = generate_crop_bbox(img, lbl)
                         continue
                     else:
                         break
+                # at least 2 classes
                 if len(cnt) > 1 and np.max(cnt) / np.sum(cnt) < self.cat_max_ratio:
                     break
                 crop_bbox = generate_crop_bbox(img, lbl)
