@@ -5,7 +5,8 @@ _base_ = [
 
 
 # record_path = '/mnt/data/nas/gyl/RS_DATASET/boxes_jsonl/gid_record.jsonl'
-boxes_path = '/data1/gyl/RS_DATASET/boxes_jsonl/fbp_boxes.jsonl'
+# boxes_path = '/data1/gyl/RS_DATASET/boxes_jsonl/fbp_boxes.jsonl'
+boxes_path = '/data1/gyl/RS_DATASET/boxes_jsonl/gid_boxes.jsonl'
 
 crop_size = (512, 512)
 
