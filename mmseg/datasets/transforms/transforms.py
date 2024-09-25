@@ -380,7 +380,7 @@ class Samhq_boxes(BaseTransform):
                 assert False, "wrong image shape:{}, index:{}, samshape:{},{}, newshape:{},{}".format(cropped_img.shape, i, h, w, new_x, new_y)
         return np.stack(cropped_imgs, axis=0), np.stack(cropped_gts, axis=0)
 
-    def weighted_random_sampling(self, arr, x, arr_len_factor=0.07):
+    def weighted_random_sampling(self, arr, x, arr_len_factor=0.05):
         arr_len = len(arr)
         some_constant = arr_len * arr_len_factor
         weights = 1 / (np.arange(arr_len) + some_constant)
