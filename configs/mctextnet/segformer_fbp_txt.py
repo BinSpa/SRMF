@@ -20,13 +20,13 @@ data_preprocessor = dict(
     seg_pad_val=255,
     clip_text=clip_text,
     size=crop_size)
-# checkpoint = 'https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b5_20220624-658746d9.pth'  # noqa
+checkpoint = 'https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b5_20220624-658746d9.pth'  # noqa
 norm_cfg = dict(type='SyncBN', requires_grad=True)
 model = dict(
     type='TextEncoderDecoder',
     data_preprocessor=data_preprocessor,
     backbone=dict(
-        # init_cfg=dict(type='Pretrained', checkpoint=checkpoint),
+        init_cfg=dict(type='Pretrained', checkpoint=checkpoint),
         in_channels=3,
         embed_dims=64,
         num_heads=[1, 2, 5, 8],
@@ -63,7 +63,7 @@ train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations'),
     # dict(type='ColorJittering'),
-    dict(type='Samhq_boxes', boxes_path=boxes_path, select_num=12, keep_gsd=True, ifmc=True),
+    dict(type='Samhq_boxes', boxes_path=boxes_path, select_num=8, keep_gsd=True, ifmc=True),
     # dict(type='RandomCrop', crop_size=crop_size, cat_max_ratio=0.75),
     dict(type='RandomFlip', prob=0.8, direction=['horizontal', 'vertical']),
     dict(type='MultiLevelCrop', crop_size=crop_size, cat_max_ratio=0.75, level_list=[1,2,3,4], withlocal=False),

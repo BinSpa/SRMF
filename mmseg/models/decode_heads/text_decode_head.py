@@ -264,7 +264,7 @@ class BaseTextDecodeHead(BaseModule, metaclass=ABCMeta):
         for data_sample in batch_data_samples:
             text_features.append(data_sample.text_features)
         text_features = torch.cat(text_features, dim=0)
-        assert text_features.shape[2] == 2048, "get text features vector dim:{}, expect 2048".format(text_features.shape)
+        assert text_features.shape[2] == 1024, "get text features vector dim:{}, expect 1024".format(text_features.shape)
         seg_logits = self.forward(inputs, text_features)
         losses = self.loss_by_feat(seg_logits, batch_data_samples)
         return losses
@@ -292,7 +292,7 @@ class BaseTextDecodeHead(BaseModule, metaclass=ABCMeta):
         for data_sample in batch_data_samples:
             text_features.append(data_sample.text_features)
         text_features = torch.cat(text_features, dim=0)
-        assert text_features.shape[2] == 2048, "get text features vector dim:{}, expect 2048".format(text_features.shape)
+        assert text_features.shape[2] == 1024, "get text features vector dim:{}, expect 1024".format(text_features.shape)
         seg_logits = self.forward(inputs, text_features)
 
         return self.predict_by_feat(seg_logits, batch_img_metas)
