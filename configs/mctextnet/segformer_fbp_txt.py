@@ -5,8 +5,8 @@ _base_ = [
 
 
 # record_path = '/mnt/data/nas/gyl/RS_DATASET/boxes_jsonl/gid_record.jsonl'
-# boxes_path = '/data1/gyl/RS_DATASET/boxes_jsonl/fbp_boxes.jsonl'
-boxes_path = '/data1/gyl/RS_DATASET/boxes_jsonl/gid_boxes.jsonl'
+boxes_path = '/data1/gyl/RS_DATASET/boxes_jsonl/fbp_boxes.jsonl'
+# boxes_path = '/data1/gyl/RS_DATASET/boxes_jsonl/gid_boxes.jsonl'
 
 crop_size = (512, 512)
 
@@ -20,13 +20,13 @@ data_preprocessor = dict(
     seg_pad_val=255,
     clip_text=clip_text,
     size=crop_size)
-checkpoint = 'https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b5_20220624-658746d9.pth'  # noqa
+# checkpoint = 'https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b5_20220624-658746d9.pth'  # noqa
 norm_cfg = dict(type='SyncBN', requires_grad=True)
 model = dict(
     type='TextEncoderDecoder',
     data_preprocessor=data_preprocessor,
     backbone=dict(
-        init_cfg=dict(type='Pretrained', checkpoint=checkpoint),
+        # init_cfg=dict(type='Pretrained', checkpoint=checkpoint),
         in_channels=3,
         embed_dims=64,
         num_heads=[1, 2, 5, 8],
@@ -82,10 +82,10 @@ val_dataloader = dict(batch_size=2, num_workers=4, dataset=dict(pipeline=test_pi
 test_dataloader = val_dataloader
 
 train_cfg = dict(
-    type='IterBasedTrainLoop', max_iters=160000, val_interval=8000)
+    type='IterBasedTrainLoop', max_iters=160000, val_interval=4000)
 
 default_hooks = dict(
-    checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=8000),
+    checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=4000),
     logger=dict(type='LoggerHook', interval=1000, log_metric_by_epoch=False),
 )
 # test visualizer
