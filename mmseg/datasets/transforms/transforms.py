@@ -628,19 +628,22 @@ class MultiLevelCrop(BaseTransform):
                 labels, cnt = np.unique(seg_temp, return_counts=True)
                 # cnt = cnt[labels != self.ignore_index]
                 if cnt.size == 0:
+                    crop_bbox = generate_crop_bbox(img, lbl)
                     continue
                 max_index = np.argmax(cnt)
                 # the main class should not be the background or ignore index
                 if labels[max_index] == self.ignore_index:
                     crop_bbox = generate_crop_bbox(img, lbl)
                     continue
+                '''
                 if labels[max_index] == 0:
-                    # if background is larger than 50%
-                    if np.max(cnt) / np.sum(cnt) > 0.4:
+                    # if background is larger than 80%
+                    if np.max(cnt) / np.sum(cnt) > 0.8:
                         crop_bbox = generate_crop_bbox(img, lbl)
                         continue
                     else:
                         break
+                '''
                 # at least 2 classes
                 if len(cnt) > 1 and np.max(cnt) / np.sum(cnt) < self.cat_max_ratio:
                     break
