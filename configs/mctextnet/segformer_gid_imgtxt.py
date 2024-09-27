@@ -38,7 +38,7 @@ optim_wrapper = dict(
     _delete_=True,
     type='OptimWrapper',
     optimizer=dict(
-        type='AdamW', lr=0.00003, betas=(0.9, 0.999), weight_decay=0.001),
+        type='AdamW', lr=0.00003, betas=(0.9, 0.999), weight_decay=0.005),
     paramwise_cfg=dict(
         custom_keys={
             'pos_block': dict(decay_mult=0.),
@@ -53,7 +53,7 @@ param_scheduler = [
         type='PolyLR',
         eta_min=1e-8,
         # power=1.0,
-        power=0.8,
+        power=1,
         begin=3000,
         end=160000,
         by_epoch=False,
@@ -78,7 +78,7 @@ test_pipeline = [
     dict(type='PackSegInputs')
 ]
 
-train_dataloader = dict(batch_size=1, num_workers=16, dataset=dict(pipeline=train_pipeline))
+train_dataloader = dict(batch_size=1, num_workers=16, dataset=dict(pipeline=train_pipeline), sampler=dict(type='InfiniteSampler', shuffle=True))
 val_dataloader = dict(batch_size=4, num_workers=4, dataset=dict(pipeline=test_pipeline))
 test_dataloader = val_dataloader
 
