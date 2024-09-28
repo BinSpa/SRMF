@@ -48,7 +48,7 @@ class MCText_SegformerHead(BaseTextDecodeHead):
         
         self.img_project = ConvModule(
             in_channels=self.channels * num_inputs,
-            out_channels=2048,
+            out_channels=1024,
             kernel_size=1,
             norm_cfg=self.norm_cfg,
         )
