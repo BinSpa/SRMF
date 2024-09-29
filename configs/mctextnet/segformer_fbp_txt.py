@@ -10,7 +10,7 @@ boxes_path = '/data1/gyl/RS_DATASET/boxes_jsonl/fbp_boxes.jsonl'
 
 crop_size = (512, 512)
 
-clip_text = "/data1/gyl/RS_Code/mmseg_exp/Code/clip_vith14_txtfeat.pt"
+clip_text = "/data1/gyl/RS_Code/mmseg_exp/Code/cliph14_txt54.pt"
 data_preprocessor = dict(
     type='MultiSegDataPreProcessor',
     mean=[123.675, 116.28, 103.53],
@@ -38,7 +38,7 @@ optim_wrapper = dict(
     _delete_=True,
     type='OptimWrapper',
     optimizer=dict(
-        type='AdamW', lr=0.00003, betas=(0.9, 0.999), weight_decay=0.005),
+        type='AdamW', lr=0.00006, betas=(0.9, 0.999), weight_decay=0.005),
     paramwise_cfg=dict(
         custom_keys={
             'pos_block': dict(decay_mult=0.),
