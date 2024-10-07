@@ -5,6 +5,7 @@ bash torchrun_test.sh ../configs/mctextnet/segformer_fbp_txt.py ../../mmseg_exp/
 # baseline
 bash torchrun_test.sh ../configs/segformer/segformer-b5_fbp.py /home/rsr/gyl/RS_Code/Paper_Graph/Introduction/segformer_ckpts/fbp.pth 1 --work-dir ../../mmseg_exp/segformerb5_fbp
 bash torchrun_test.sh ../configs/segformer/segformer_mit-b5_8xb2-160k_gid-512x512.py /home/rsr/gyl/RS_Code/Paper_Graph/Introduction/segformer_ckpts/mc_gid.pth 1 --work-dir ../../mmseg_exp/segformerb5_gid
+bash torchrun_test.sh ../configs/segformer/segformer-b5_fbp.py ../../mmseg_exp/segformerb5_fbp/iter_48000.pth 1 --work-dir ../../mmseg_visual/FBP/segformer
 # samhq
 ## keepgsd
 bash torchrun_test.sh ../configs/samhqnet/segformer_gid.py  /data1/gyl/RS_Code/mmseg_exp/samhq1_gid/iter_120000.pth 1 --work-dir ../../mmseg_exp/samhq1_gid
