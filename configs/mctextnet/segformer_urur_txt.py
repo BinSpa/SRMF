@@ -85,8 +85,7 @@ train_cfg = dict(
 default_hooks = dict(
     checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=8000),
     logger=dict(type='LoggerHook', interval=1000, log_metric_by_epoch=False),
-    # test
-    visualization=dict(type='SegVisualizationHook', interval=10)
+    visualization=dict(type='SegVisualizationHook', draw=True, interval=10)
 )
 # test
 vis_backends = [dict(type='LocalVisBackend')]
