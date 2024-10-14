@@ -49,7 +49,7 @@ param_scheduler = [
 
 # By default, models are trained on 8 GPUs with 2 images per GPU
 train_dataloader = dict(batch_size=8,num_workers=10)
-val_dataloader = dict(batch_size=2,num_workers=2)
+val_dataloader = dict(batch_size=1,num_workers=2)
 test_dataloader = val_dataloader
 
 # train cfg and default hooks
@@ -60,7 +60,7 @@ default_hooks = dict(
     checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=16000),
     logger=dict(type='LoggerHook', interval=1000, log_metric_by_epoch=False),
     # test visualizer
-    visualization=dict(type='SegVisualizationHook', draw=True, interval=10),
+    visualization=dict(type='SegVisualizationHook', draw=True, interval=10)
 )
 
 # test visualizer

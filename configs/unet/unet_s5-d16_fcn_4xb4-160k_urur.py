@@ -22,7 +22,7 @@ default_hooks = dict(
     checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=8000),
     logger=dict(type='LoggerHook', interval=1000, log_metric_by_epoch=False),
     # test visualizer
-    visualization=dict(type='SegVisualizationHook', draw=True, interval=1)
+    visualization=dict(type='SegVisualizationHook', draw=True, interval=10)
 )
 
 # test visualizer

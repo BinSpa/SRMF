@@ -76,7 +76,7 @@ test_pipeline = [
 ]
 
 train_dataloader = dict(batch_size=1, num_workers=16, dataset=dict(pipeline=train_pipeline))
-val_dataloader = dict(batch_size=4, num_workers=4, dataset=dict(pipeline=test_pipeline))
+val_dataloader = dict(batch_size=1, num_workers=4, dataset=dict(pipeline=test_pipeline))
 test_dataloader = val_dataloader
 
 train_cfg = dict(

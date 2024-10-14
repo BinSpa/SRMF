@@ -19,7 +19,7 @@ bash torchrun_test.sh ../configs/swin/swin-base-patch4-window7-urur-512x512.py /
 bash torchrun_test.sh ../configs/swin/swin-base-patch4-window7-fbp-512x512.py ../../mmseg_exp/swinbase_fbp/iter_64000.pth 1 --work-dir ../../mmseg_visual/FBP/swinbase
 # unet
 bash torchrun_test.sh ../configs/unet/unet_s5-d16_fcn_4xb4-160k_gid.py /data1/gyl/RS_Code/mmseg_exp/unet_gid/iter_152000.pth 1 --work-dir ../../mmseg_visual/unet_gid
-bash torchrun_test.sh ../configs/unet/unet_s5-d16_fcn_4xb4-160k_urur.py /data1/gyl/RS_Code/mmseg_exp/unet_urur/iter_128000.pth 1 --work-dir ../../mmseg_visual/unet_urur
+bash torchrun_test.sh ../configs/unet/unet_s5-d16_fcn_4xb4-160k_urur.py /data1/gyl/RS_Code/mmseg_exp/unet_urur/iter_128000.pth 1 --work-dir ../../mmseg_visual/URUR/unet
 # pspnet
 bash torchrun_test.sh ../configs/pspnet/pspnet_r101-d8_4xb4-80k_gid-512x512.py ../../mmseg_visual/pspnet_gid/iter_8000.pth 1 --work-dir ../../mmseg_visual/pspnet_gid
 bash torchrun_test.sh ../configs/pspnet/pspnet_r101-d8_4xb4-80k_urur-512x512.py ../../mmseg_visual/pspnet_urur/iter_80000.pth 1 --work-dir ../../mmseg_visual/pspnet_urur
