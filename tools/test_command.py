@@ -1,6 +1,6 @@
 # mc_text
-bash torchrun_test.sh ../configs/mctextnet/segformer_urur_txt.py ../../mmseg_exp/mctxt_urur/iter_112000.pth 1 --work-dir ../../mmseg_exp/mctxt_urur
-bash torchrun_test.sh ../configs/mctextnet/segformer_gid.py ../../mmseg_exp/mctxt_gid/iter_96000.pth 1 --work-dir ../../mmseg_exp/mctxt_gid
+bash torchrun_test.sh ../configs/mctextnet/segformer_urur_txt.py ../../mmseg_exp/mctxt_urur/iter_112000.pth 1 --work-dir ../../mmseg_visual/URUR/mctxt
+bash torchrun_test.sh ../configs/mctextnet/segformer_gid.py ../../mmseg_exp/mctxt_gid/iter_96000.pth 1 --work-dir ../../mmseg_visual/URUR/mctxt
 bash torchrun_test.sh ../configs/mctextnet/segformer_fbp_txt.py ../../mmseg_exp/mctxt_fbp/iter_136000.pth 1 --work-dir ../../mmseg_visual/FBP/mctxt
 # baseline
 bash torchrun_test.sh ../configs/segformer/segformer-b5_fbp.py /home/rsr/gyl/RS_Code/Paper_Graph/Introduction/segformer_ckpts/fbp.pth 1 --work-dir ../../mmseg_exp/segformerb5_fbp
@@ -15,7 +15,7 @@ bash torchrun_test.sh ../configs/samhqnet/segformer_onlysam_gid.py /data1/gyl/RS
 bash torchrun_test.sh ../configs/samhqnet/segformer_onlysam_fbp.py /data1/gyl/RS_Code/mmseg_exp/onlysam_gid/iter_80000.pth 1 --work-dir ../../mmseg_exp/onlysam_fbp
 # swin-base 
 bash torchrun_test.sh ../configs/swin/swin-base-patch4-window7-gid-512x512.py /data1/gyl/RS_Code/mmseg_exp/swinbase_gid/iter_16000.pth 1 --work-dir ../../mmseg_visual/swinbase_gid
-bash torchrun_test.sh ../configs/swin/swin-base-patch4-window7-urur-512x512.py /data1/gyl/RS_Code/mmseg_exp/swinbase_urur/iter_32000.pth 1 --work-dir ../../mmseg_visual/swinbase_urur
+bash torchrun_test.sh ../configs/swin/swin-base-patch4-window7-urur-512x512.py /data1/gyl/RS_Code/mmseg_exp/swinbase_urur/iter_32000.pth 1 --work-dir ../../mmseg_visual/URUR/swinbase
 bash torchrun_test.sh ../configs/swin/swin-base-patch4-window7-fbp-512x512.py ../../mmseg_exp/swinbase_fbp/iter_64000.pth 1 --work-dir ../../mmseg_visual/FBP/swinbase
 # unet
 bash torchrun_test.sh ../configs/unet/unet_s5-d16_fcn_4xb4-160k_gid.py /data1/gyl/RS_Code/mmseg_exp/unet_gid/iter_152000.pth 1 --work-dir ../../mmseg_visual/unet_gid
