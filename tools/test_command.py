@@ -3,9 +3,9 @@ bash torchrun_test.sh ../configs/mctextnet/segformer_urur_txt.py ../../mmseg_exp
 bash torchrun_test.sh ../configs/mctextnet/segformer_gid.py ../../mmseg_exp/mctxt_gid/iter_96000.pth 1 --work-dir ../../mmseg_visual/URUR/mctxt
 bash torchrun_test.sh ../configs/mctextnet/segformer_fbp_txt.py ../../mmseg_exp/mctxt_fbp/iter_136000.pth 1 --work-dir ../../mmseg_visual/FBP/mctxt
 # baseline
-bash torchrun_test.sh ../configs/segformer/segformer-b5_fbp.py /home/rsr/gyl/RS_Code/Paper_Graph/Introduction/segformer_ckpts/fbp.pth 1 --work-dir ../../mmseg_exp/segformerb5_fbp
 bash torchrun_test.sh ../configs/segformer/segformer_mit-b5_8xb2-160k_gid-512x512.py /home/rsr/gyl/RS_Code/Paper_Graph/Introduction/segformer_ckpts/mc_gid.pth 1 --work-dir ../../mmseg_exp/segformerb5_gid
 bash torchrun_test.sh ../configs/segformer/segformer-b5_fbp.py ../../mmseg_exp/segformerb5_fbp/iter_48000.pth 1 --work-dir ../../mmseg_visual/FBP/segformer
+bash torchrun_test.sh ../configs/segformer/segformer-b5_fbp.py ../../mmseg_exp/segformerb5_urur/iter_48000.pth 1 --work-dir ../../mmseg_visual/URUR/segformer
 # samhq
 ## keepgsd
 bash torchrun_test.sh ../configs/samhqnet/segformer_gid.py  /data1/gyl/RS_Code/mmseg_exp/samhq1_gid/iter_120000.pth 1 --work-dir ../../mmseg_exp/samhq1_gid
@@ -22,7 +22,7 @@ bash torchrun_test.sh ../configs/unet/unet_s5-d16_fcn_4xb4-160k_gid.py /data1/gy
 bash torchrun_test.sh ../configs/unet/unet_s5-d16_fcn_4xb4-160k_urur.py /data1/gyl/RS_Code/mmseg_exp/unet_urur/iter_128000.pth 1 --work-dir ../../mmseg_visual/URUR/unet
 # pspnet
 bash torchrun_test.sh ../configs/pspnet/pspnet_r101-d8_4xb4-80k_gid-512x512.py ../../mmseg_visual/pspnet_gid/iter_8000.pth 1 --work-dir ../../mmseg_visual/pspnet_gid
-bash torchrun_test.sh ../configs/pspnet/pspnet_r101-d8_4xb4-80k_urur-512x512.py ../../mmseg_visual/pspnet_urur/iter_80000.pth 1 --work-dir ../../mmseg_visual/pspnet_urur
+bash torchrun_test.sh ../configs/pspnet/pspnet_r101-d8_4xb4-80k_urur-512x512.py ../../mmseg_visual/URUR/pspnet/iter_80000.pth 1 --work-dir ../../mmseg_visual/URUR/pspnet
 bash torchrun_test.sh ../configs/pspnet/pspnet_r101-d8_4xb4-80k_fbp-512x512.py ../../mmseg_exp/pspnet_fbp/iter_80000.pth 1 --work-dir ../../mmseg_visual/FBP/pspnet
 # deeplabv3+
 bash torchrun_test.sh ../configs/deeplabv3plus/deeplabv3plus_r101-d8_4xb4-160k_gid-512x512.py ../../mmseg_visual/deeplabv3p_gid/iter_16000.pth 1 --work-dir ../../mmseg_visual/deeplabv3p_gid

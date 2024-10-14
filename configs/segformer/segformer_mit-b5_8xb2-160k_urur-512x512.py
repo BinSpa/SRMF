@@ -54,6 +54,6 @@ visualizer = dict(
 default_hooks = dict(
     logger=dict(type='LoggerHook', interval=1000, log_metric_by_epoch=False),
     checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=8000),
-    visualization=dict(type='SegVisualizationHook', draw=True, interval=1)
+    visualization=dict(type='SegVisualizationHook', draw=True, interval=10)
 )
 
