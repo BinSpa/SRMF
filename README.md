@@ -2,6 +2,15 @@
 
 ![Architecture Overview](images/main.jpg)
 
+- [Introduction](#introduction)
+- [Dataset Preparation](#dataset-preparation)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Running the Code](#running-the-code)
+- [Pre-trained Models](#pre-trained-models)
+- [Citation](#citation)
+- [Acknowledgements](#acknowledgements)
+
 ## Introduction
 
 This repository contains the implementation of **SRMF**, a novel framework for semantic segmentation in ultra-high-resolution (UHR) satellite imagery. SRMF addresses the long-tail class distribution problem by incorporating a multi-scale cropping technique alongside a data augmentation strategy based on semantic reordering and resampling. The model also leverages multimodal fusion to integrate textual and visual features, which results in a more robust segmentation performance.
@@ -17,14 +26,14 @@ This repository contains the implementation of **SRMF**, a novel framework for s
 ```
 urur/
   ├── train
-  ├── image
-  ├── label
+    ├── image
+    ├── label
   ├── val
-  ├── image
-  ├── label
+    ├── image
+    ├── label
   ├── test
-  ├── image
-  ├── label
+    ├── image
+    ├── label
 
 gid/
   ├── train
@@ -51,7 +60,12 @@ fbp/
 - PyTorch 2.0.0
 - timm 0.9.16
 - mmcv 2.1.0
-- mmengine 0.10.3
+- mmengine 0.10.3 
+- You can install the mmsegmentation by 
+  ```bash
+  git clone https://github.com/username/srmf.git
+  pip install -v -e .
+  ```
 
 Or you can directly import the environment from the following YAML file:
 ``` conda env create -f srmf.yml ```
