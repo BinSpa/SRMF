@@ -55,24 +55,35 @@ fbp/
 
 Or you can directly import the environment from the following YAML file:
 ``` conda env create -f srmf.yml ```
+You can download the yaml file from [here](https://pan.baidu.com/s/1uSBoiAO0S5juBDLwBF5rwA?pwd=ukab).
 
 ### Running the Code
 
 1. Clone this repository:
-   ```bash
-   git clone https://github.com/username/srmf.git
-   cd srmf
-   ```
+  ```bash
+  git clone https://github.com/username/srmf.git
+  cd tools
+  ```
 
 2. Train the model:
-   ```bash
-   python train.py --config configs/srmf_config.yaml
-   ```
+  ``` bash
+  # GID Dataset
+  bash torchrun_train.sh ../configs/mctextnet/srmf_gid.py 2 --work-dir your_save_path/
+  # URUR Dataset
+  bash torchrun_train.sh ../configs/mctextnet/srmf_urur.py 2 --work-dir your_save_path/
+  # FBP Dataset
+  bash torchrun_train.sh ../configs/mctextnet/srmf_fbp.py 2 --work-dir your_save_path/ --amp
+  ```
 
 3. Test the model:
-   ```bash
-   python test.py --checkpoint path/to/checkpoint.pth
-   ```
+  ```bash
+  # GID Dataset
+  bash torchrun_test.sh ../configs/mctextnet/srmf_gid.py your_checkpoint_path/ 1 --work-dir your_save_path/
+  # URUR Dataset
+  bash torchrun_test.sh ../configs/mctextnet/srmf_urur.py your_checkpoint_path/ 1 --work-dir your_save_path/
+  # FBP Dataset
+  bash torchrun_test.sh ../configs/mctextnet/srmf_fbp.py your_checkpoint_path/ 1 --work-dir your_save_path/
+  ```
 
 ## Pre-trained Models
 
