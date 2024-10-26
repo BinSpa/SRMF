@@ -106,12 +106,6 @@ Download the pre-trained models from the following links:
 - SRMF on GID: [Download link](https://pan.baidu.com/s/1OyqkHJDtUFFW8JFBilOdNw?pwd=wbds)
 - SRMF on FBP: [Download link](https://pan.baidu.com/s/1XgaNGx7d8NMsB_ceTGlyNQ?pwd=7xge)
 
-Place the downloaded models in the `checkpoints/` directory:
-```bash
-mkdir checkpoints
-mv path/to/downloaded_model checkpoints/
-```
-
 ## Citation
 
 If you find this work useful, please cite our paper:
