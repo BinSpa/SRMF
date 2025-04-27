@@ -21,8 +21,10 @@ This repository contains the implementation of **SRMF**, a novel framework for s
    - URUR: [Download link](https://github.com/jankyee/URUR.git)
    - GID: [Download link](https://x-ytong.github.io/project/GID.html)
    - FBP: [Download link](https://x-ytong.github.io/project/Five-Billion-Pixels.html)
+   - DeepGlobe: [Download link](https://deepglobe.org/)
+   - WHU-OPT-SAR: [Download link](https://github.com/AmberHen/WHU-OPT-SAR-dataset)
 
-2. Unzip the datasets and organize them as follows,  you need to manually convert the image parts of the GID and FBP datasets from four-channel images to RGB images:
+2. Unzip the datasets and organize them as follows,  you need to manually convert the image parts of the GID, FBP and WHU-OPT-SAR datasets from four-channel images to RGB images. The training, validation, and test set splits for WHU-OPT-SAR and DeepGlobe are shown in images/DeepGlobe and images/WHU-OPT-SAR.
 ```
 urur/
   ├── train
@@ -50,6 +52,22 @@ fbp/
   ├── val
     ├── rgb_images
     ├── fbp_labels
+
+whu-opt-sar/
+  ├── train
+    ├── rgb_train
+    ├── lbl_train
+  ├── val
+    ├── rgb_test
+    ├── lbl_test
+
+deepglobe/
+  ├── train_train
+    ├── image
+    ├── label
+  ├── train_val
+    ├── image
+    ├── label
 ```
 
 ## Getting Started
@@ -87,6 +105,8 @@ You can download the yaml file from [here](https://pan.baidu.com/s/1uSBoiAO0S5ju
   bash torchrun_train.sh ../configs/mctextnet/srmf_urur.py 2 --work-dir your_save_path/
   # FBP Dataset
   bash torchrun_train.sh ../configs/mctextnet/srmf_fbp.py 2 --work-dir your_save_path/ --amp
+  bash torchrun_train.sh ../configs/mctextnet/srmf_whuopt.py 2 --work-dir ../../mmseg_exp/srmf_whuopt
+  bash torchrun_train.sh ../configs/mctextnet/srmf_dg.py 2 --work-dir ../../mmseg_exp/srmf_dg
   ```
 
 3. Test the model:
@@ -97,6 +117,10 @@ You can download the yaml file from [here](https://pan.baidu.com/s/1uSBoiAO0S5ju
   bash torchrun_test.sh ../configs/mctextnet/srmf_urur.py your_checkpoint_path/ 1 --work-dir your_save_path/
   # FBP Dataset
   bash torchrun_test.sh ../configs/mctextnet/srmf_fbp.py your_checkpoint_path/ 1 --work-dir your_save_path/
+  # DeepGlobe
+  bash torchrun_test.sh ../configs/mctextnet/srmf_dg.py your_checkpoint_path/ 1 --work-dir your_save_path/
+  # whu-opt-sar
+  bash torchrun_test.sh ../configs/mctextnet/srmf_whuopt.py your_checkpoint_path/ 1 --work-dir your_save_path/
   ```
 
 ## Pre-trained Models
@@ -105,6 +129,8 @@ Download the pre-trained models from the following links:
 - SRMF on URUR: [Download link](https://pan.baidu.com/s/15tmFcHH_4c-m5WnTIzgW6A?pwd=wuha), 
 - SRMF on GID: [Download link](https://pan.baidu.com/s/1OyqkHJDtUFFW8JFBilOdNw?pwd=wbds)
 - SRMF on FBP: [Download link](https://pan.baidu.com/s/1XgaNGx7d8NMsB_ceTGlyNQ?pwd=7xge)
+- SRMF on DeepGlobe: [Download link](https://pan.baidu.com/s/1OyqkHJDtUFFW8JFBilOdNw?pwd=wbds)
+- SRMF on WHU-OPT-SAR: [Download link](https://pan.baidu.com/s/1XgaNGx7d8NMsB_ceTGlyNQ?pwd=7xge)
 
 ## Citation
 
